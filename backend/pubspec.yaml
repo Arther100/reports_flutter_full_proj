@@ -1,0 +1,16 @@
+name: power_operations_backend
+description: Dart API server for Power Operations - connects to MS SQL via bridge
+version: 1.0.0
+
+environment:
+  sdk: ^3.0.0
+
+dependencies:
+  shelf: ^1.4.1
+  shelf_router: ^1.1.4
+  shelf_cors_headers: ^0.1.5
+  dotenv: ^4.2.0
+  http: ^1.2.0
+  
+dev_dependencies:
+  lints: ^3.0.0
