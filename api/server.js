@@ -47,24 +47,24 @@ const databases = {
 
 // Connection pools for each database
 const pools = {};
-let currentDatabaseId = 'rupos_preprod'; // Default database
+let currentDatabaseId = 'rupos_preprod';
 
 // Initialize database connection
-async function initializeDatabase(dbId = 'rupos_preprod') {
+async function initializeDatabase(dbId) {
   try {
     if (!pools[dbId]) {
       const config = databases[dbId];
       if (!config) {
-        throw new Error(`Database configuration not found for: ${dbId}`);
+        throw new Error(`Database configuration not found: ${dbId}`);
       }
       pools[dbId] = await new sql.ConnectionPool(config).connect();
-      console.log(`✅ Connected to MS SQL Server: ${dbId}`);
+      console.log(`✅ Connected to database: ${dbId}`);
       console.log(`   Server: ${config.server}`);
       console.log(`   Database: ${config.database}`);
     }
     return pools[dbId];
   } catch (err) {
-    console.error(`❌ Database connection failed for ${dbId}:`, err.message);
+    console.error(`❌ Failed to connect to ${dbId}:`, err.message);
     throw err;
   }
 }
@@ -77,23 +77,29 @@ function getCurrentPool() {
 // Health check endpoint
 app.get('/api/health', (req, res) => {
   const pool = getCurrentPool();
-  res.json({ 
-    status: 'healthy', 
+  res.json({
+    status: 'healthy',
     database: pool?.connected ? 'connected' : 'disconnected',
     currentDatabase: currentDatabaseId,
-    timestamp: new Date().toISOString() 
+    timestamp: new Date().toISOString()
   });
 });
 
 // Get available databases
 app.get('/api/databases', (req, res) => {
-  const dbList = Object.keys(databases).map(id => ({
-    id,
-    name: databases[id].database,
-    server: databases[id].server,
-    connected: pools[id]?.connected || false
-  }));
-  res.json({ success: true, data: dbList, current: currentDatabaseId });
+  const dbList = Object.keys(databases).map(id => {
+    return {
+      id: id,
+      name: databases[id].database,
+      server: databases[id].server,
+      connected: pools[id]?.connected || false
+    };
+  });
+  res.json({
+    success: true,
+    data: dbList,
+    current: currentDatabaseId
+  });
 });
 
 // Switch database
@@ -101,44 +107,55 @@ app.post('/api/switch-database', async (req, res) => {
   try {
     const { databaseId } = req.body;
     if (!databases[databaseId]) {
-      return res.status(400).json({ 
-        success: false, 
-        message: `Database not found: ${databaseId}` 
+      return res.status(400).json({
+        success: false,
+        message: `Database not found: ${databaseId}`
       });
     }
-    
+
     await initializeDatabase(databaseId);
     currentDatabaseId = databaseId;
-    
-    res.json({ 
-      success: true, 
+
+    res.json({
+      success: true,
       message: `Switched to database: ${databaseId}`,
       currentDatabase: currentDatabaseId
     });
   } catch (err) {
-    res.status(500).json({ success: false, message: err.message });
+    res.status(500).json({
+      success: false,
+      message: err.message
+    });
   }
 });
 
-// Get all tables in the current database
-app.get('/api/tables', async (req, res) {
+// Get all tables in current database
+app.get('/api/tables', async (req, res) => {
   try {
     const pool = getCurrentPool();
     if (!pool) {
-      return res.status(500).json({ 
-        success: false, 
-        message: 'No database connection' 
+      return res.status(500).json({
+        success: false,
+        message: 'No database connection'
       });
     }
+
     const result = await pool.request().query(`
       SELECT TABLE_NAME 
       FROM INFORMATION_SCHEMA.TABLES 
       WHERE TABLE_TYPE = 'BASE TABLE'
       ORDER BY TABLE_NAME
     `);
-    res.json({ success: true, data: result.recordset });
+
+    res.json({
+      success: true,
+      data: result.recordset
+    });
   } catch (err) {
-    res.status(500).json({ success: false, message: err.message });
+    res.status(500).json({
+      success: false,
+      message: err.message
+    });
   }
 });
 
@@ -147,11 +164,12 @@ app.get('/api/tables/:tableName/columns', async (req, res) => {
   try {
     const pool = getCurrentPool();
     if (!pool) {
-      return res.status(500).json({ 
-        success: false, 
-        message: 'No database connection' 
+      return res.status(500).json({
+        success: false,
+        message: 'No database connection'
       });
     }
+
     const { tableName } = req.params;
     const result = await pool.request()
       .input('tableName', sql.VarChar, tableName)
@@ -161,9 +179,16 @@ app.get('/api/tables/:tableName/columns', async (req, res) => {
         WHERE TABLE_NAME = @tableName
         ORDER BY ORDINAL_POSITION
       `);
-    res.json({ success: true, data: result.recordset });
+
+    res.json({
+      success: true,
+      data: result.recordset
+    });
   } catch (err) {
-    res.status(500).json({ success: false, message: err.message });
+    res.status(500).json({
+      success: false,
+      message: err.message
+    });
   }
 });
 
@@ -172,32 +197,33 @@ app.get('/api/data/:tableName', async (req, res) => {
   try {
     const pool = getCurrentPool();
     if (!pool) {
-      return res.status(500).json({ 
-        success: false, 
-        message: 'No database connection' 
+      return res.status(500).json({
+        success: false,
+        message: 'No database connection'
       });
     }
+
     const { tableName } = req.params;
     const { page = 1, pageSize = 50, orderBy, order = 'DESC' } = req.query;
-    
+
     const offset = (parseInt(page) - 1) * parseInt(pageSize);
-    
+
     // Get total count
     const countResult = await pool.request().query(`
       SELECT COUNT(*) as total FROM [${tableName}]
     `);
     const totalCount = countResult.recordset[0].total;
-    
+
     // Get paginated data
-    let query = `
+    const query = `
       SELECT * FROM [${tableName}]
-      ORDER BY ${orderBy ? `[${orderBy}]` : '(SELECT NULL)'}  ${order}
+      ORDER BY ${orderBy ? `[${orderBy}]` : '(SELECT NULL)'} ${order}
       OFFSET ${offset} ROWS
       FETCH NEXT ${parseInt(pageSize)} ROWS ONLY
     `;
-    
+
     const result = await pool.request().query(query);
-    
+
     res.json({
       success: true,
       data: result.recordset,
@@ -207,67 +233,45 @@ app.get('/api/data/:tableName', async (req, res) => {
       totalPages: Math.ceil(totalCount / parseInt(pageSize))
     });
   } catch (err) {
-    res.status(500).json({ success: false, message: err.message });
+    res.status(500).json({
+      success: false,
+      message: err.message
+    });
   }
 });
 
-// Execute custom SQL query (for flexibility)
+// Execute custom SQL query
 app.post('/api/query', async (req, res) => {
   try {
     const pool = getCurrentPool();
     if (!pool) {
-      return res.status(500).json({ 
-        success: false, 
-        message: 'No database connection' 
+      return res.status(500).json({
+        success: false,
+        message: 'No database connection'
       });
     }
+
     const { query } = req.body;
-    
+
     if (!query) {
-      return res.status(400).json({ success: false, message: 'Query is required' });
+      return res.status(400).json({
+        success: false,
+        message: 'Query is required'
+      });
     }
-    
+
     const result = await pool.request().query(query);
-    res.json({ 
-      success: true, 
+
+    res.json({
+      success: true,
       data: result.recordset,
       rowsAffected: result.rowsAffected
     });
   } catch (err) {
-    res.status(500).json({ success: false, message: err.message });
-  }
-});
-
-// Power Data endpoints (will be customized based on your tables)
-app.get('/api/power-data', async (req, res) => {
-  try {
-    const pool = getCurrentPool();
-    if (!pool) {
-      return res.status(500).json({ 
-        success: false, 
-        message: 'No database connection' 
-      });
-    }
-    const { page = 1, pageSize = 50 } = req.query;
-    const offset = (parseInt(page) - 1) * parseInt(pageSize);
-    
-    // TODO: Update this query based on your actual table structure
-    // For now, let's try to find relevant tables
-    const tables = await pool.request().query(`
-      SELECT TABLE_NAME 
-      FROM INFORMATION_SCHEMA.TABLES 
-      WHERE TABLE_TYPE = 'BASE TABLE'
-      ORDER BY TABLE_NAME
-    `);
-    
-    res.json({
-      success: true,
-      message: 'Please specify your power data table. Available tables:',
-      tables: tables.recordset.map(t => t.TABLE_NAME),
-      data: []
+    res.status(500).json({
+      success: false,
+      message: err.message
     });
-  } catch (err) {
-    res.status(500).json({ success: false, message: err.message });
   }
 });
 
@@ -276,25 +280,33 @@ app.get('/api/data/:tableName/latest', async (req, res) => {
   try {
     const pool = getCurrentPool();
     if (!pool) {
-      return res.status(500).json({ 
-        success: false, 
-        message: 'No database connection' 
+      return res.status(500).json({
+        success: false,
+        message: 'No database connection'
       });
     }
+
     const { tableName } = req.params;
     const { limit = 10, dateColumn } = req.query;
-    
+
     let query;
     if (dateColumn) {
       query = `SELECT TOP ${parseInt(limit)} * FROM [${tableName}] ORDER BY [${dateColumn}] DESC`;
     } else {
       query = `SELECT TOP ${parseInt(limit)} * FROM [${tableName}]`;
     }
-    
+
     const result = await pool.request().query(query);
-    res.json({ success: true, data: result.recordset });
+
+    res.json({
+      success: true,
+      data: result.recordset
+    });
   } catch (err) {
-    res.status(500).json({ success: false, message: err.message });
+    res.status(500).json({
+      success: false,
+      message: err.message
+    });
   }
 });
 
@@ -303,12 +315,12 @@ app.get('/api/dashboard', async (req, res) => {
   try {
     const pool = getCurrentPool();
     if (!pool) {
-      return res.status(500).json({ 
-        success: false, 
-        message: 'No database connection' 
+      return res.status(500).json({
+        success: false,
+        message: 'No database connection'
       });
     }
-    // Get list of tables as initial dashboard data
+
     const tables = await pool.request().query(`
       SELECT TABLE_NAME, 
         (SELECT COUNT(*) FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME = t.TABLE_NAME) as ColumnCount
@@ -316,49 +328,17 @@ app.get('/api/dashboard', async (req, res) => {
       WHERE TABLE_TYPE = 'BASE TABLE'
       ORDER BY TABLE_NAME
     `);
-    
+
     res.json({
       success: true,
-      data: {
-        tables: tables.recordset,
-        tableCount: tables.recordset.length,
-        timestamp: new Date().toISOString()
-      }
+      database: currentDatabaseId,
+      tables: tables.recordset
     });
   } catch (err) {
-    res.status(500).json({ success: false, message: err.message });
-  }
-});
-
-// Chart data endpoint
-app.get('/api/chart-data', async (req, res) => {
-  try {
-    const { tableName, valueColumn, dateColumn, startDate, endDate } = req.query;
-    
-    if (!tableName || !valueColumn) {
-      return res.json({
-        success: false,
-        message: 'tableName and valueColumn are required',
-        data: []
-      });
-    }
-    
-    let query = `
-      SELECT [${dateColumn || 'CreatedDate'}] as timestamp, 
-             [${valueColumn}] as value
-      FROM [${tableName}]
-    `;
-    
-    if (startDate && endDate && dateColumn) {
-      query += ` WHERE [${dateColumn}] BETWEEN '${startDate}' AND '${endDate}'`;
-    }
-    
-    query += ` ORDER BY [${dateColumn || 'CreatedDate'}]`;
-    
-    const result = await pool.request().query(query);
-    res.json({ success: true, data: result.recordset });
-  } catch (err) {
-    res.status(500).json({ success: false, message: err.message });
+    res.status(500).json({
+      success: false,
+      message: err.message
+    });
   }
 });
 
@@ -367,23 +347,25 @@ app.get('/api/data/:tableName/statistics', async (req, res) => {
   try {
     const pool = getCurrentPool();
     if (!pool) {
-      return res.status(500).json({ 
-        success: false, 
-        message: 'No database connection' 
+      return res.status(500).json({
+        success: false,
+        message: 'No database connection'
       });
     }
+
     const { tableName } = req.params;
     const { columns } = req.query;
-    
+
     if (!columns) {
-      // Return row count only
       const result = await pool.request().query(`
         SELECT COUNT(*) as totalRecords FROM [${tableName}]
       `);
-      return res.json({ success: true, data: result.recordset[0] });
+      return res.json({
+        success: true,
+        data: result.recordset[0]
+      });
     }
-    
-    // Get statistics for specified numeric columns
+
     const columnList = columns.split(',');
     const statsQuery = columnList.map(col => `
       SUM([${col.trim()}]) as [${col.trim()}_sum],
@@ -391,14 +373,20 @@ app.get('/api/data/:tableName/statistics', async (req, res) => {
       MAX([${col.trim()}]) as [${col.trim()}_max],
       MIN([${col.trim()}]) as [${col.trim()}_min]
     `).join(', ');
-    
+
     const result = await pool.request().query(`
       SELECT ${statsQuery}, COUNT(*) as totalRecords FROM [${tableName}]
     `);
-    
-    res.json({ success: true, data: result.recordset[0] });
+
+    res.json({
+      success: true,
+      data: result.recordset[0]
+    });
   } catch (err) {
-    res.status(500).json({ success: false, message: err.message });
+    res.status(500).json({
+      success: false,
+      message: err.message
+    });
   }
 });
 
@@ -428,6 +416,13 @@ Promise.all([
     console.log('');
   });
 }).catch(err => {
-  console.error('Failed to initialize databases:', err);
-  process.exit(1);
+  console.error('❌ Failed to initialize databases:', err.message);
+  console.log('');
+  console.log('⚠️  Starting server with limited functionality...');
+  console.log('   Only successfully connected databases will be available.');
+  console.log('');
+  
+  app.listen(PORT, () => {
+    console.log(`Server running at: http://localhost:${PORT}`);
+  });
 });
