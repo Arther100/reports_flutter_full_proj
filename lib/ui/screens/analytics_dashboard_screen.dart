@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'dart:math' as math;
 import 'dart:convert';
+import 'dart:ui';
 import '../../providers/analytics_provider.dart';
 import '../../data/models/analytics_model.dart';
 import '../widgets/shimmer_widgets.dart';
@@ -59,8 +60,7 @@ class _AnalyticsDashboardScreenState extends State<AnalyticsDashboardScreen>
                   SliverToBoxAdapter(
                     child: Column(
                       children: [
-                        _buildDateFilterChips(context, provider),
-                        _buildStoreSelector(context, provider),
+                        _buildFilterBar(context, provider),
                         _buildOverallSummary(context, provider),
                         _buildSalesTrendChart(context, provider),
                         _buildComparisonChartsRow(context, provider),
@@ -227,6 +227,513 @@ class _AnalyticsDashboardScreenState extends State<AnalyticsDashboardScreen>
         const SizedBox(width: 8),
       ],
     );
+  }
+
+  // ==================== MODERN FILTER BAR ====================
+
+  Widget _buildFilterBar(BuildContext context, AnalyticsProvider provider) {
+    final screenWidth = MediaQuery.of(context).size.width;
+    final isMobile = screenWidth < 600;
+    final isTablet = screenWidth >= 600 && screenWidth < 1024;
+
+    return Container(
+      margin: EdgeInsets.symmetric(horizontal: isMobile ? 8 : 16, vertical: 8),
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: [
+            Theme.of(context).colorScheme.primaryContainer.withOpacity(0.3),
+            Theme.of(context).colorScheme.secondaryContainer.withOpacity(0.2),
+            Theme.of(context).colorScheme.tertiaryContainer.withOpacity(0.1),
+          ],
+        ),
+        borderRadius: BorderRadius.circular(20),
+        border: Border.all(
+          color: Theme.of(context).colorScheme.primary.withOpacity(0.2),
+          width: 1.5,
+        ),
+        boxShadow: [
+          BoxShadow(
+            color: Theme.of(context).colorScheme.primary.withOpacity(0.1),
+            blurRadius: 20,
+            offset: const Offset(0, 4),
+            spreadRadius: 2,
+          ),
+          BoxShadow(
+            color: Colors.black.withOpacity(0.05),
+            blurRadius: 10,
+            offset: const Offset(0, 2),
+          ),
+        ],
+      ),
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(20),
+        child: BackdropFilter(
+          filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
+          child: Container(
+            padding: EdgeInsets.all(isMobile ? 12 : 16),
+            decoration: BoxDecoration(
+              color: Theme.of(context).colorScheme.surface.withOpacity(0.8),
+            ),
+            child: isMobile
+                ? Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      _buildDateRangeDropdown(context, provider),
+                      const SizedBox(height: 12),
+                      _buildStoreDropdown(context, provider),
+                    ],
+                  )
+                : Row(
+                    children: [
+                      Expanded(
+                        flex: isTablet ? 3 : 2,
+                        child: _buildDateRangeDropdown(context, provider),
+                      ),
+                      SizedBox(width: isMobile ? 8 : 16),
+                      Expanded(
+                        flex: isTablet ? 2 : 1,
+                        child: _buildStoreDropdown(context, provider),
+                      ),
+                    ],
+                  ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildDateRangeDropdown(
+    BuildContext context,
+    AnalyticsProvider provider,
+  ) {
+    final screenWidth = MediaQuery.of(context).size.width;
+    final isMobile = screenWidth < 600;
+
+    final filterOptions = [
+      ('Today', 'today', Icons.today, Colors.orange),
+      ('Yesterday', 'yesterday', Icons.calendar_today, Colors.blue),
+      ('This Week', 'this_week', Icons.view_week, Colors.purple),
+      ('Last 7 Days', 'last_7_days', Icons.date_range, Colors.cyan),
+      ('This Month', 'this_month', Icons.calendar_month, Colors.green),
+      ('Last 30 Days', 'last_30_days', Icons.calendar_view_month, Colors.teal),
+      ('This Quarter', 'this_quarter', Icons.pie_chart, Colors.indigo),
+      ('This Year', 'this_year', Icons.calendar_view_week, Colors.deepPurple),
+      ('Last 365 Days', 'last_365_days', Icons.history, Colors.amber),
+      ('All Time', 'all_time', Icons.all_inclusive, Colors.pink),
+      ('Custom Range', 'custom', Icons.edit_calendar, Colors.red),
+    ];
+
+    final currentFilterType = provider.currentFilter.filterType;
+    final selectedOption = filterOptions.firstWhere(
+      (opt) => opt.$2 == currentFilterType,
+      orElse: () => filterOptions[0],
+    );
+
+    return Container(
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          colors: [
+            selectedOption.$4.withOpacity(0.15),
+            selectedOption.$4.withOpacity(0.05),
+          ],
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+        ),
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: selectedOption.$4.withOpacity(0.4), width: 2),
+        boxShadow: [
+          BoxShadow(
+            color: selectedOption.$4.withOpacity(0.2),
+            blurRadius: 8,
+            offset: const Offset(0, 2),
+          ),
+        ],
+      ),
+      child: Material(
+        color: Colors.transparent,
+        child: InkWell(
+          borderRadius: BorderRadius.circular(16),
+          onTap: () {}, // Handled by dropdown
+          child: Padding(
+            padding: EdgeInsets.symmetric(
+              horizontal: isMobile ? 12 : 16,
+              vertical: isMobile ? 10 : 12,
+            ),
+            child: DropdownButtonHideUnderline(
+              child: DropdownButton<String>(
+                value: selectedOption.$2,
+                isExpanded: true,
+                isDense: false,
+                icon: Container(
+                  padding: const EdgeInsets.all(4),
+                  decoration: BoxDecoration(
+                    color: selectedOption.$4.withOpacity(0.2),
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  child: Icon(
+                    Icons.keyboard_arrow_down_rounded,
+                    color: selectedOption.$4,
+                    size: 20,
+                  ),
+                ),
+                style: TextStyle(
+                  color: Theme.of(context).colorScheme.onSurface,
+                  fontSize: isMobile ? 14 : 15,
+                  fontWeight: FontWeight.w600,
+                  letterSpacing: 0.3,
+                ),
+                dropdownColor: Theme.of(context).colorScheme.surface,
+                borderRadius: BorderRadius.circular(16),
+                elevation: 8,
+                items: filterOptions.map((option) {
+                  final isSelected = option.$2 == selectedOption.$2;
+                  return DropdownMenuItem<String>(
+                    value: option.$2,
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(
+                        vertical: 8,
+                        horizontal: 4,
+                      ),
+                      decoration: isSelected
+                          ? BoxDecoration(
+                              gradient: LinearGradient(
+                                colors: [
+                                  option.$4.withOpacity(0.15),
+                                  option.$4.withOpacity(0.05),
+                                ],
+                              ),
+                              borderRadius: BorderRadius.circular(8),
+                            )
+                          : null,
+                      child: Row(
+                        children: [
+                          Container(
+                            padding: const EdgeInsets.all(6),
+                            decoration: BoxDecoration(
+                              color: option.$4.withOpacity(0.2),
+                              borderRadius: BorderRadius.circular(8),
+                            ),
+                            child: Icon(option.$3, size: 18, color: option.$4),
+                          ),
+                          const SizedBox(width: 12),
+                          Expanded(
+                            child: Text(
+                              option.$1,
+                              style: TextStyle(
+                                fontWeight: isSelected
+                                    ? FontWeight.bold
+                                    : FontWeight.w500,
+                                color: isSelected
+                                    ? option.$4
+                                    : Theme.of(context).colorScheme.onSurface,
+                              ),
+                            ),
+                          ),
+                          if (isSelected)
+                            Icon(
+                              Icons.check_circle,
+                              color: option.$4,
+                              size: 20,
+                            ),
+                        ],
+                      ),
+                    ),
+                  );
+                }).toList(),
+                onChanged: (String? value) async {
+                  if (value == null) return;
+
+                  if (value == 'custom') {
+                    await _showCustomDateRangePicker(context, provider);
+                  } else {
+                    // Apply predefined filter
+                    switch (value) {
+                      case 'today':
+                        provider.filterToday();
+                        break;
+                      case 'yesterday':
+                        provider.filterYesterday();
+                        break;
+                      case 'this_week':
+                        provider.filterThisWeek();
+                        break;
+                      case 'last_7_days':
+                        provider.filterLast7Days();
+                        break;
+                      case 'this_month':
+                        provider.filterThisMonth();
+                        break;
+                      case 'last_30_days':
+                        provider.filterLast30Days();
+                        break;
+                      case 'this_quarter':
+                        provider.filterThisQuarter();
+                        break;
+                      case 'this_year':
+                        provider.filterThisYear();
+                        break;
+                      case 'last_365_days':
+                        provider.filterLast365Days();
+                        break;
+                      case 'all_time':
+                        provider.filterAllTime();
+                        break;
+                    }
+                  }
+                },
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildStoreDropdown(BuildContext context, AnalyticsProvider provider) {
+    final screenWidth = MediaQuery.of(context).size.width;
+    final isMobile = screenWidth < 600;
+    final hasSelection = provider.hasStoreFilter;
+
+    return AnimatedContainer(
+      duration: const Duration(milliseconds: 300),
+      curve: Curves.easeInOut,
+      decoration: BoxDecoration(
+        gradient: hasSelection
+            ? LinearGradient(
+                colors: [
+                  Theme.of(context).colorScheme.primary.withOpacity(0.2),
+                  Theme.of(context).colorScheme.primary.withOpacity(0.1),
+                ],
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+              )
+            : LinearGradient(
+                colors: [
+                  Theme.of(context).colorScheme.surfaceContainerHighest,
+                  Theme.of(
+                    context,
+                  ).colorScheme.surfaceContainerHighest.withOpacity(0.8),
+                ],
+              ),
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(
+          color: hasSelection
+              ? Theme.of(context).colorScheme.primary
+              : Theme.of(context).colorScheme.outline.withOpacity(0.3),
+          width: hasSelection ? 2 : 1.5,
+        ),
+        boxShadow: hasSelection
+            ? [
+                BoxShadow(
+                  color: Theme.of(context).colorScheme.primary.withOpacity(0.3),
+                  blurRadius: 8,
+                  offset: const Offset(0, 2),
+                ),
+              ]
+            : [
+                BoxShadow(
+                  color: Colors.black.withOpacity(0.05),
+                  blurRadius: 4,
+                  offset: const Offset(0, 1),
+                ),
+              ],
+      ),
+      child: Material(
+        color: Colors.transparent,
+        child: InkWell(
+          onTap: () => _showStoreSelectionDialog(context, provider),
+          borderRadius: BorderRadius.circular(16),
+          child: Padding(
+            padding: EdgeInsets.symmetric(
+              horizontal: isMobile ? 12 : 16,
+              vertical: isMobile ? 12 : 14,
+            ),
+            child: Row(
+              children: [
+                Container(
+                  padding: const EdgeInsets.all(6),
+                  decoration: BoxDecoration(
+                    color: hasSelection
+                        ? Theme.of(context).colorScheme.primary.withOpacity(0.2)
+                        : Theme.of(context).colorScheme.surfaceContainerHighest,
+                    borderRadius: BorderRadius.circular(8),
+                    border: Border.all(
+                      color: hasSelection
+                          ? Theme.of(
+                              context,
+                            ).colorScheme.primary.withOpacity(0.3)
+                          : Colors.transparent,
+                    ),
+                  ),
+                  child: Icon(
+                    Icons.storefront_rounded,
+                    size: 18,
+                    color: hasSelection
+                        ? Theme.of(context).colorScheme.primary
+                        : Theme.of(context).colorScheme.onSurfaceVariant,
+                  ),
+                ),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Text(
+                        hasSelection
+                            ? '${provider.selectedStores.length} Store${provider.selectedStores.length > 1 ? 's' : ''} Selected'
+                            : 'All Stores',
+                        style: TextStyle(
+                          fontWeight: FontWeight.w600,
+                          fontSize: isMobile ? 14 : 15,
+                          color: hasSelection
+                              ? Theme.of(context).colorScheme.primary
+                              : Theme.of(context).colorScheme.onSurface,
+                          letterSpacing: 0.2,
+                        ),
+                      ),
+                      if (hasSelection && !isMobile)
+                        Text(
+                          'Tap to change',
+                          style: TextStyle(
+                            fontSize: 11,
+                            color: Theme.of(
+                              context,
+                            ).colorScheme.onSurfaceVariant.withOpacity(0.7),
+                            fontWeight: FontWeight.w400,
+                          ),
+                        ),
+                    ],
+                  ),
+                ),
+                if (hasSelection)
+                  Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      const SizedBox(width: 8),
+                      GestureDetector(
+                        onTap: () {
+                          provider.clearStoreSelection();
+                          provider.loadDashboard();
+                        },
+                        child: Container(
+                          padding: const EdgeInsets.all(4),
+                          decoration: BoxDecoration(
+                            color: Theme.of(
+                              context,
+                            ).colorScheme.error.withOpacity(0.1),
+                            borderRadius: BorderRadius.circular(6),
+                          ),
+                          child: Icon(
+                            Icons.close_rounded,
+                            size: 16,
+                            color: Theme.of(context).colorScheme.error,
+                          ),
+                        ),
+                      ),
+                    ],
+                  )
+                else
+                  Container(
+                    padding: const EdgeInsets.all(4),
+                    decoration: BoxDecoration(
+                      color: Theme.of(
+                        context,
+                      ).colorScheme.surfaceContainerHighest,
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    child: Icon(
+                      Icons.keyboard_arrow_down_rounded,
+                      color: Theme.of(context).colorScheme.onSurfaceVariant,
+                      size: 20,
+                    ),
+                  ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  Future<void> _showCustomDateRangePicker(
+    BuildContext context,
+    AnalyticsProvider provider,
+  ) async {
+    final DateTimeRange? picked = await showDateRangePicker(
+      context: context,
+      firstDate: DateTime(2020, 1, 1),
+      lastDate: DateTime.now(),
+      initialDateRange: DateTimeRange(
+        start: provider.currentFilter.startDate,
+        end: provider.currentFilter.endDate,
+      ),
+      helpText: 'Select Custom Date Range',
+      cancelText: 'Cancel',
+      confirmText: 'Apply',
+      saveText: 'Done',
+      builder: (context, child) {
+        return Theme(
+          data: Theme.of(context).copyWith(
+            colorScheme: Theme.of(context).colorScheme.copyWith(
+              primary: Theme.of(context).colorScheme.primary,
+              onPrimary: Theme.of(context).colorScheme.onPrimary,
+              surface: Theme.of(context).colorScheme.surface,
+              onSurface: Theme.of(context).colorScheme.onSurface,
+            ),
+            dialogTheme: DialogThemeData(
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(24),
+              ),
+              elevation: 16,
+            ),
+            datePickerTheme: DatePickerThemeData(
+              backgroundColor: Theme.of(context).colorScheme.surface,
+              headerBackgroundColor: Theme.of(context).colorScheme.primary,
+              headerForegroundColor: Theme.of(context).colorScheme.onPrimary,
+              dayStyle: TextStyle(fontSize: 14, fontWeight: FontWeight.w500),
+              rangePickerBackgroundColor: Theme.of(
+                context,
+              ).colorScheme.primaryContainer,
+              rangeSelectionBackgroundColor: Theme.of(
+                context,
+              ).colorScheme.primaryContainer.withOpacity(0.3),
+              todayBorder: BorderSide(
+                color: Theme.of(context).colorScheme.primary,
+                width: 2,
+              ),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(16),
+              ),
+            ),
+            textButtonTheme: TextButtonThemeData(
+              style: TextButton.styleFrom(
+                foregroundColor: Theme.of(context).colorScheme.primary,
+                textStyle: const TextStyle(
+                  fontWeight: FontWeight.w600,
+                  fontSize: 14,
+                ),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 24,
+                  vertical: 12,
+                ),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12),
+                ),
+              ),
+            ),
+          ),
+          child: child!,
+        );
+      },
+    );
+
+    if (picked != null) {
+      final customFilter = DateRangeFilter.custom(picked.start, picked.end);
+      await provider.applyFilter(customFilter);
+    }
   }
 
   Widget _buildDateFilterChips(
