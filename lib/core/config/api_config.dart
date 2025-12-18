@@ -8,7 +8,7 @@ class ApiConfig {
   );
 
   // Local development URL
-  static const String localUrl = 'http://127.0.0.1:5000';
+  // static const String localUrl = 'http://127.0.0.1:5000';
 
   // Check if running in production mode
   static const bool isProduction = bool.fromEnvironment('dart.vm.product');

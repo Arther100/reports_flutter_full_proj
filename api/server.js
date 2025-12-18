@@ -47,7 +47,8 @@ const databases = {
 
 // Connection pools for each database
 const pools = {};
-let currentDatabaseId = 'rupos_preprod';
+// Auto-select Teapioca database on startup
+let currentDatabaseId = 'teapioca_fpdb';
 
 // Initialize database connection
 async function initializeDatabase(dbId) {
@@ -106,7 +107,10 @@ app.get('/api/databases', (req, res) => {
 app.post('/api/switch-database', async (req, res) => {
   try {
     const { databaseId } = req.body;
+    console.log(`📝 Switch database request: ${currentDatabaseId} → ${databaseId}`);
+    
     if (!databases[databaseId]) {
+      console.log(`❌ Database not found: ${databaseId}`);
       return res.status(400).json({
         success: false,
         message: `Database not found: ${databaseId}`
@@ -114,7 +118,10 @@ app.post('/api/switch-database', async (req, res) => {
     }
 
     await initializeDatabase(databaseId);
+    const oldDb = currentDatabaseId;
     currentDatabaseId = databaseId;
+    
+    console.log(`✅ Successfully switched: ${oldDb} → ${databaseId}`);
 
     res.json({
       success: true,
@@ -122,6 +129,7 @@ app.post('/api/switch-database', async (req, res) => {
       currentDatabase: currentDatabaseId
     });
   } catch (err) {
+    console.log(`❌ Error switching database:`, err.message);
     res.status(500).json({
       success: false,
       message: err.message
@@ -245,6 +253,7 @@ app.post('/api/query', async (req, res) => {
   try {
     const pool = getCurrentPool();
     if (!pool) {
+      console.log('❌ No database connection available');
       return res.status(500).json({
         success: false,
         message: 'No database connection'
@@ -260,14 +269,21 @@ app.post('/api/query', async (req, res) => {
       });
     }
 
+    console.log(`🔍 Executing query on database: ${currentDatabaseId}`);
+    console.log(`   Query preview: ${query.substring(0, 100)}...`);
+
     const result = await pool.request().query(query);
+    
+    console.log(`✅ Query completed: ${result.recordset.length} rows returned`);
 
     res.json({
       success: true,
       data: result.recordset,
-      rowsAffected: result.rowsAffected
+      rowsAffected: result.rowsAffected,
+      currentDatabase: currentDatabaseId
     });
   } catch (err) {
+    console.log(`❌ Query error:`, err.message);
     res.status(500).json({
       success: false,
       message: err.message
@@ -410,8 +426,8 @@ Promise.all([
     console.log(`  List tables: http://localhost:${PORT}/api/tables`);
     console.log('  ');
     console.log('  📊 Connected Databases:');
-    console.log('     • RuposPreProd (POS Analytics) - DEFAULT');
-    console.log('     • TeapiocaFPDB_local (PowerBI Store)');
+    console.log('     • TeapiocaFPDB_local (PowerBI Store) - DEFAULT');
+    console.log('     • RuposPreProd (POS Analytics)');
     console.log('═══════════════════════════════════════════════════════════');
     console.log('');
   });

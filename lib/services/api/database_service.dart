@@ -10,7 +10,7 @@ class DatabaseService {
   Future<List<DatabaseConfig>> getAvailableDatabases() async {
     try {
       final response = await http.get(Uri.parse('$baseUrl/databases'));
-      
+
       if (response.statusCode == 200) {
         final data = jsonDecode(response.body);
         if (data['success'] == true) {
@@ -48,14 +48,11 @@ class DatabaseService {
   Future<Map<String, dynamic>?> getCurrentDatabase() async {
     try {
       final response = await http.get(Uri.parse('$baseUrl/databases'));
-      
+
       if (response.statusCode == 200) {
         final data = jsonDecode(response.body);
         if (data['success'] == true) {
-          return {
-            'current': data['current'],
-            'databases': data['data'],
-          };
+          return {'current': data['current'], 'databases': data['data']};
         }
       }
       return null;
@@ -69,7 +66,7 @@ class DatabaseService {
   Future<List<String>> getTables() async {
     try {
       final response = await http.get(Uri.parse('$baseUrl/tables'));
-      
+
       if (response.statusCode == 200) {
         final data = jsonDecode(response.body);
         if (data['success'] == true && data['data'] != null) {

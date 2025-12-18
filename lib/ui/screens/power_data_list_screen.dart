@@ -128,7 +128,7 @@ class _PowerDataListScreenState extends State<PowerDataListScreen> {
               Consumer<PowerDataProvider>(
                 builder: (context, provider, _) {
                   return DropdownButtonFormField<String>(
-                    value: selectedStation,
+                    initialValue: selectedStation,
                     decoration: const InputDecoration(labelText: 'Station'),
                     items: [
                       const DropdownMenuItem(

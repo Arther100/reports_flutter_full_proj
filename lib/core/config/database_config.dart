@@ -25,14 +25,14 @@ class DatabaseConfig {
   });
 
   Map<String, dynamic> toJson() => {
-        'id': id,
-        'name': name,
-        'host': host,
-        'database': database,
-        'username': username,
-        'password': password,
-        'port': port,
-      };
+    'id': id,
+    'name': name,
+    'host': host,
+    'database': database,
+    'username': username,
+    'password': password,
+    'port': port,
+  };
 
   factory DatabaseConfig.fromJson(Map<String, dynamic> json) {
     return DatabaseConfig(
@@ -61,7 +61,7 @@ class DatabaseConfigs {
     username: 'RuposPreProd',
     password: 'RuposPreProd',
     port: 1433,
-    isDefault: true,
+    isDefault: false,
     icon: '📊',
     color: '#4CAF50',
   );
@@ -81,10 +81,7 @@ class DatabaseConfigs {
   );
 
   // List of all available databases
-  static List<DatabaseConfig> get allDatabases => [
-        ruposPreprod,
-        teapiocaFPDB,
-      ];
+  static List<DatabaseConfig> get allDatabases => [ruposPreprod, teapiocaFPDB];
 
   // Get database by ID
   static DatabaseConfig? getById(String id) {
@@ -94,8 +91,4 @@ class DatabaseConfigs {
       return null;
     }
   }
-
-  // Get default database
-  static DatabaseConfig get defaultDatabase =>
-      allDatabases.firstWhere((db) => db.isDefault, orElse: () => ruposPreprod);
 }

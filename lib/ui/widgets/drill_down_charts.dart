@@ -333,8 +333,9 @@ class _DrillDownBarChartState extends State<DrillDownBarChart> {
             sideTitles: fl.SideTitles(
               showTitles: true,
               getTitlesWidget: (value, meta) {
-                if (value.toInt() >= widget.data.length)
+                if (value.toInt() >= widget.data.length) {
                   return const SizedBox();
+                }
                 return Padding(
                   padding: const EdgeInsets.only(top: 8),
                   child: RotatedBox(

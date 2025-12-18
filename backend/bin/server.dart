@@ -3,9 +3,9 @@ import 'package:shelf/shelf.dart';
 import 'package:shelf/shelf_io.dart' as shelf_io;
 import 'package:shelf_cors_headers/shelf_cors_headers.dart';
 
-import '../lib/config/db_config.dart';
-import '../lib/services/database_service.dart';
-import '../lib/routes/api_handler.dart';
+import 'package:power_operations_backend/config/db_config.dart';
+import 'package:power_operations_backend/services/database_service.dart';
+import 'package:power_operations_backend/routes/api_handler.dart';
 
 /// Main entry point for the backend server
 Future<void> main() async {

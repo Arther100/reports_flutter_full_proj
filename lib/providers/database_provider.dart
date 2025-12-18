@@ -4,37 +4,34 @@ import '../services/api/database_service.dart';
 
 class DatabaseProvider extends ChangeNotifier {
   final DatabaseService _dbService = DatabaseService();
-  
-  DatabaseConfig _currentDatabase = DatabaseConfigs.defaultDatabase;
-  List<DatabaseConfig> _availableDatabases = DatabaseConfigs.allDatabases;
+
+  DatabaseConfig? _currentDatabase;
+  final List<DatabaseConfig> _availableDatabases = DatabaseConfigs.allDatabases;
   bool _isLoading = false;
   String? _errorMessage;
   List<String> _currentTables = [];
 
-  DatabaseConfig get currentDatabase => _currentDatabase;
+  DatabaseConfig? get currentDatabase => _currentDatabase;
   List<DatabaseConfig> get availableDatabases => _availableDatabases;
   bool get isLoading => _isLoading;
   String? get errorMessage => _errorMessage;
   List<String> get currentTables => _currentTables;
 
-  /// Initialize - load current database info
+  /// Initialize - Auto-select Teapioca database for testing
   Future<void> initialize() async {
     _isLoading = true;
     _errorMessage = null;
     notifyListeners();
 
     try {
-      final info = await _dbService.getCurrentDatabase();
-      if (info != null) {
-        final currentId = info['current'] as String?;
-        if (currentId != null) {
-          final db = DatabaseConfigs.getById(currentId);
-          if (db != null) {
-            _currentDatabase = db;
-          }
-        }
-      }
-      await loadTables();
+      // TEMPORARY: Auto-select Teapioca database for testing
+      // TODO: Uncomment below to restore user selection
+      _currentDatabase = DatabaseConfigs.teapiocaFPDB;
+      await switchDatabase(_currentDatabase!);
+
+      // Original code (commented for testing):
+      // _currentDatabase = null;
+      // _currentTables = [];
     } catch (e) {
       _errorMessage = 'Failed to initialize: $e';
       print(_errorMessage);
@@ -46,7 +43,7 @@ class DatabaseProvider extends ChangeNotifier {
 
   /// Switch to a different database
   Future<bool> switchDatabase(DatabaseConfig database) async {
-    if (_currentDatabase.id == database.id) {
+    if (_currentDatabase?.id == database.id) {
       return true; // Already on this database
     }
 
@@ -88,7 +85,7 @@ class DatabaseProvider extends ChangeNotifier {
 
   /// Check if current database is a specific one
   bool isDatabase(String databaseId) {
-    return _currentDatabase.id == databaseId;
+    return _currentDatabase?.id == databaseId;
   }
 
   /// Check if POS Analytics database is active
@@ -96,4 +93,7 @@ class DatabaseProvider extends ChangeNotifier {
 
   /// Check if PowerBI database is active
   bool get isPowerBIDatabase => isDatabase('teapioca_fpdb');
+
+  /// Check if any database is selected
+  bool get hasDatabase => _currentDatabase != null;
 }

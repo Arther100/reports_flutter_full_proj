@@ -169,6 +169,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                 ),
                 DropdownButton<String>(
                   value: provider.selectedInterval,
+                  elevation: 24,
                   items: const [
                     DropdownMenuItem(value: 'minute', child: Text('Minute')),
                     DropdownMenuItem(value: 'hour', child: Text('Hourly')),

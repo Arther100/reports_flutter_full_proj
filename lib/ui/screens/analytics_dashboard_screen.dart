@@ -2,9 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'dart:math' as math;
-import 'dart:convert';
 import 'dart:ui';
 import '../../providers/analytics_provider.dart';
+import '../../providers/database_provider.dart';
 import '../../data/models/analytics_model.dart';
 import '../widgets/shimmer_widgets.dart';
 import '../widgets/drill_down_dialog.dart';
@@ -19,27 +19,123 @@ class AnalyticsDashboardScreen extends StatefulWidget {
 
 class _AnalyticsDashboardScreenState extends State<AnalyticsDashboardScreen>
     with SingleTickerProviderStateMixin {
-  int _touchedIndex = -1;
   int _selectedChartType = 0; // 0: Line, 1: Bar, 2: Area, 3: Scatter, 4: Step
   bool _showAdvancedMetrics = true;
+  String? _lastDatabaseId;
 
   @override
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      context.read<AnalyticsProvider>().loadDashboard();
+      _loadDataIfNeeded();
     });
   }
 
-  @override
-  void dispose() {
-    super.dispose();
+  void _loadDataIfNeeded() {
+    final dbProvider = context.read<DatabaseProvider>();
+    // Only load if we have the correct database
+    if (dbProvider.isPOSDatabase) {
+      _lastDatabaseId = dbProvider.currentDatabase?.id;
+      context.read<AnalyticsProvider>().loadDashboard();
+    }
   }
 
   @override
   Widget build(BuildContext context) {
-    final screenWidth = MediaQuery.of(context).size.width;
-    final isMobile = screenWidth < 600;
+    final dbProvider = context.watch<DatabaseProvider>();
+
+    // Show loading if database is being switched
+    if (dbProvider.isLoading && !dbProvider.isPOSDatabase) {
+      return Scaffold(
+        body: Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              CircularProgressIndicator(),
+              const SizedBox(height: 16),
+              Text(
+                'Switching to POS Database...',
+                style: TextStyle(fontSize: 16, color: Colors.grey[700]),
+              ),
+            ],
+          ),
+        ),
+      );
+    }
+
+    // Check if database changed and reload data
+    if (dbProvider.isPOSDatabase &&
+        dbProvider.currentDatabase?.id != _lastDatabaseId) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        _loadDataIfNeeded();
+      });
+    }
+
+    // Check if we're on the wrong database (and not loading)
+    if (!dbProvider.isPOSDatabase) {
+      return Scaffold(
+        body: Center(
+          child: Container(
+            margin: const EdgeInsets.all(32),
+            padding: const EdgeInsets.all(32),
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(16),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.orange.withOpacity(0.2),
+                  blurRadius: 10,
+                  offset: const Offset(0, 4),
+                ),
+              ],
+            ),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Icon(Icons.info_outline, size: 64, color: Colors.orange[400]),
+                const SizedBox(height: 16),
+                Text(
+                  'Wrong Database',
+                  style: TextStyle(
+                    fontSize: 20,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.grey[800],
+                  ),
+                ),
+                const SizedBox(height: 8),
+                Text(
+                  'POS Analytics requires the RuposPreProd database.\nCurrently connected to: ${dbProvider.currentDatabase?.name ?? "None"}',
+                  style: TextStyle(fontSize: 14, color: Colors.grey[600]),
+                  textAlign: TextAlign.center,
+                ),
+                const SizedBox(height: 24),
+                ElevatedButton.icon(
+                  onPressed: () {
+                    final posDb = dbProvider.availableDatabases.firstWhere(
+                      (db) => db.id == 'rupos_preprod',
+                    );
+                    dbProvider.switchDatabase(posDb);
+                  },
+                  icon: const Icon(Icons.sync),
+                  label: const Text('Switch to POS Database'),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.blue[700],
+                    foregroundColor: Colors.white,
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 24,
+                      vertical: 12,
+                    ),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      );
+    }
 
     return Scaffold(
       body: Consumer<AnalyticsProvider>(
@@ -185,6 +281,7 @@ class _AnalyticsDashboardScreenState extends State<AnalyticsDashboardScreen>
         PopupMenuButton<String>(
           icon: const Icon(Icons.file_download_outlined, size: 22),
           tooltip: 'Export',
+          elevation: 16,
           onSelected: (value) => _handleExport(context, provider, value),
           itemBuilder: (context) => [
             const PopupMenuItem(
@@ -386,7 +483,7 @@ class _AnalyticsDashboardScreenState extends State<AnalyticsDashboardScreen>
                 ),
                 dropdownColor: Theme.of(context).colorScheme.surface,
                 borderRadius: BorderRadius.circular(16),
-                elevation: 8,
+                elevation: 24,
                 items: filterOptions.map((option) {
                   final isSelected = option.$2 == selectedOption.$2;
                   return DropdownMenuItem<String>(
@@ -736,6 +833,7 @@ class _AnalyticsDashboardScreenState extends State<AnalyticsDashboardScreen>
     }
   }
 
+  // ignore: unused_element
   Widget _buildDateFilterChips(
     BuildContext context,
     AnalyticsProvider provider,
@@ -786,6 +884,7 @@ class _AnalyticsDashboardScreenState extends State<AnalyticsDashboardScreen>
 
   // ==================== STORE SELECTOR ====================
 
+  // ignore: unused_element
   Widget _buildStoreSelector(BuildContext context, AnalyticsProvider provider) {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
@@ -1054,6 +1153,7 @@ class _AnalyticsDashboardScreenState extends State<AnalyticsDashboardScreen>
     );
   }
 
+  // ignore: unused_element
   Widget _buildKPICards(BuildContext context, AnalyticsProvider provider) {
     final overview = provider.salesOverview;
 
@@ -1663,6 +1763,7 @@ class _AnalyticsDashboardScreenState extends State<AnalyticsDashboardScreen>
 
   // ==================== NEW BUSINESS METRICS SECTION ====================
 
+  // ignore: unused_element
   Widget _buildBusinessMetricsSection(
     BuildContext context,
     AnalyticsProvider provider,
@@ -1684,9 +1785,6 @@ class _AnalyticsDashboardScreenState extends State<AnalyticsDashboardScreen>
         : 0.0;
     final taxRate = overview.totalSales > 0
         ? (overview.taxCollected / overview.totalSales * 100)
-        : 0.0;
-    final netMargin = overview.totalSales > 0
-        ? ((overview.netRevenue / overview.totalSales) * 100)
         : 0.0;
     final ordersPerCustomer = overview.uniqueCustomers > 0
         ? (overview.totalOrders / overview.uniqueCustomers)
@@ -1902,7 +2000,6 @@ class _AnalyticsDashboardScreenState extends State<AnalyticsDashboardScreen>
     SalesOverview overview,
   ) {
     final grossSales = overview.totalSales + overview.discountGiven;
-    final netAfterDiscount = overview.totalSales;
     final netAfterTax = overview.netRevenue;
 
     if (grossSales == 0) return const SizedBox.shrink();
@@ -2717,7 +2814,6 @@ class _AnalyticsDashboardScreenState extends State<AnalyticsDashboardScreen>
             ),
             const SizedBox(height: 12),
             ...top3.asMap().entries.map((entry) {
-              final index = entry.key;
               final customer = entry.value;
 
               return Padding(
@@ -3203,8 +3299,9 @@ class _AnalyticsDashboardScreenState extends State<AnalyticsDashboardScreen>
         sideTitles: SideTitles(
           showTitles: true,
           getTitlesWidget: (value, meta) {
-            if (value.toInt() >= trends.length || value < 0)
+            if (value.toInt() >= trends.length || value < 0) {
               return const SizedBox();
+            }
             final date = trends[value.toInt()].date;
             return Padding(
               padding: const EdgeInsets.only(top: 8),
@@ -3724,6 +3821,7 @@ class _AnalyticsDashboardScreenState extends State<AnalyticsDashboardScreen>
     return colors[index % colors.length];
   }
 
+  // ignore: unused_element
   Color _getPaymentColor(String method) {
     switch (method.toLowerCase()) {
       case 'cash':
@@ -3964,15 +4062,16 @@ Average Order Value: ₹${_formatNumber(overview.avgOrderValue)}''';
     // Top products
     if (q.contains('product') &&
         (q.contains('selling') || q.contains('top') || q.contains('best'))) {
-      if (topProducts.isEmpty)
+      if (topProducts.isEmpty) {
         return '❌ No product data available for the selected period.';
+      }
 
       final top5 = topProducts.take(5);
       var response = '🏆 **Top Selling Products:**\n\n';
       int rank = 1;
       for (final p in top5) {
         response +=
-            '${rank}. **${p.productName}**\n   └ ₹${_formatNumber(p.totalRevenue)} (${p.quantitySold} units)\n';
+            '$rank. **${p.productName}**\n   └ ₹${_formatNumber(p.totalRevenue)} (${p.quantitySold} units)\n';
         rank++;
       }
       return response;
@@ -3991,15 +4090,16 @@ Orders per Customer: ${overview.uniqueCustomers > 0 ? (overview.totalOrders / ov
 
     // Top customers
     if (q.contains('customer') && (q.contains('top') || q.contains('best'))) {
-      if (topCustomers.isEmpty)
+      if (topCustomers.isEmpty) {
         return '❌ No customer data available for the selected period.';
+      }
 
       final top5 = topCustomers.take(5);
       var response = '👥 **Top Customers:**\n\n';
       int rank = 1;
       for (final c in top5) {
         response +=
-            '${rank}. **${c.customerName}**\n   └ ₹${_formatNumber(c.totalSpent)} (${c.orderCount} orders)\n';
+            '$rank. **${c.customerName}**\n   └ ₹${_formatNumber(c.totalSpent)} (${c.orderCount} orders)\n';
         rank++;
       }
       return response;
@@ -4008,15 +4108,15 @@ Orders per Customer: ${overview.uniqueCustomers > 0 ? (overview.totalOrders / ov
     // Store sales
     if (q.contains('store') &&
         (q.contains('highest') || q.contains('top') || q.contains('best'))) {
-      if (storeSales.isEmpty)
+      if (storeSales.isEmpty) {
         return '❌ No store data available for the selected period.';
+      }
 
-      final topStore = storeSales.first;
       var response = '🏪 **Top Performing Stores:**\n\n';
       int rank = 1;
       for (final s in storeSales.take(5)) {
         response +=
-            '${rank}. **${s.storeName}** (${s.city})\n   └ ₹${_formatNumber(s.totalSales)} (${s.orderCount} orders)\n';
+            '$rank. **${s.storeName}** (${s.city})\n   └ ₹${_formatNumber(s.totalSales)} (${s.orderCount} orders)\n';
         rank++;
       }
       return response;
@@ -4459,7 +4559,7 @@ class _StoreSelectionDialogState extends State<_StoreSelectionDialog> {
                   const SizedBox(width: 8),
                   Expanded(
                     child: DropdownButtonFormField<String>(
-                      value: _selectedType,
+                      initialValue: _selectedType,
                       decoration: InputDecoration(
                         isDense: true,
                         border: OutlineInputBorder(

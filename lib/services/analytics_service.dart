@@ -65,9 +65,9 @@ class AnalyticsService {
   // Get all stores
   Future<List<Store>> getAllStores() async {
     final query = '''
-      SELECT StoreID, StoreName, StoreType, City 
-      FROM STORES 
-      ORDER BY StoreName
+      SELECT id as StoreID, name as StoreName, '' as StoreType, '' as City 
+      FROM allstoresdetails 
+      ORDER BY name
     ''';
     final result = await _executeQuery(query);
     return result.map((e) => Store.fromJson(e)).toList();

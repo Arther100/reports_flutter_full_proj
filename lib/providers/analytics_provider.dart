@@ -18,9 +18,9 @@ class AnalyticsProvider with ChangeNotifier {
   // Separate loading states for different sections
   bool _isSalesLoading = false;
   bool _isProductsLoading = false;
-  bool _isCustomersLoading = false;
+  final bool _isCustomersLoading = false;
   bool _isPredictionsLoading = false;
-  bool _isStoreTypesLoading = false;
+  final bool _isStoreTypesLoading = false;
   bool _isDrillDownLoading = false;
 
   // Store type and customer type summaries

@@ -237,13 +237,9 @@ class _CacheInterceptor extends Interceptor {
 class _CacheEntry {
   final dynamic data;
   final DateTime timestamp;
-  final Duration maxAge;
 
-  _CacheEntry({
-    required this.data,
-    required this.timestamp,
-    this.maxAge = const Duration(minutes: 5),
-  });
+  _CacheEntry({required this.data, required this.timestamp});
 
-  bool get isExpired => DateTime.now().difference(timestamp) > maxAge;
+  bool get isExpired =>
+      DateTime.now().difference(timestamp) > const Duration(minutes: 5);
 }

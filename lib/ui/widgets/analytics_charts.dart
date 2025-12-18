@@ -548,8 +548,9 @@ class SalesPredictionCard extends StatelessWidget {
                       sideTitles: SideTitles(
                         showTitles: true,
                         getTitlesWidget: (value, meta) {
-                          if (value.toInt() >= predictions.length)
+                          if (value.toInt() >= predictions.length) {
                             return const SizedBox();
+                          }
                           final date = predictions[value.toInt()].predictedDate;
                           return Padding(
                             padding: const EdgeInsets.only(top: 4),

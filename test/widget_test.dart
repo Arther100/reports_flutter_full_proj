@@ -1,6 +1,5 @@
 // Power Operations App Widget Tests
 
-import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 import 'package:power_operations_app/main.dart';

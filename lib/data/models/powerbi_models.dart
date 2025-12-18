@@ -1,4 +1,5 @@
 /// Models for PowerBI Admin Store Reports (TeapiocaFPDB)
+library;
 
 // Helper functions
 int _parseInt(dynamic value) {
@@ -36,7 +37,10 @@ class PowerBIStore {
   factory PowerBIStore.fromJson(Map<String, dynamic> json) {
     return PowerBIStore(
       storeId: json['StoreID']?.toString() ?? json['storeId']?.toString() ?? '',
-      storeName: json['StoreName']?.toString() ?? json['storeName']?.toString() ?? 'Unknown',
+      storeName:
+          json['StoreName']?.toString() ??
+          json['storeName']?.toString() ??
+          'Unknown',
       city: json['City']?.toString() ?? json['city']?.toString(),
       state: json['State']?.toString() ?? json['state']?.toString(),
       totalSales: _parseDouble(json['TotalSales'] ?? json['totalSales']),
@@ -48,7 +52,7 @@ class PowerBIStore {
 class PowerBICategory {
   final String categoryId;
   final String categoryName;
-  final List<PowerBICategoryItem> items;
+  List<PowerBICategoryItem> items;
   final Map<String, double> storeSales; // Store ID -> Sales Amount
   final double totalSales;
   bool isExpanded;
@@ -62,7 +66,10 @@ class PowerBICategory {
     this.isExpanded = false,
   });
 
-  factory PowerBICategory.fromJson(Map<String, dynamic> json, List<String> storeIds) {
+  factory PowerBICategory.fromJson(
+    Map<String, dynamic> json,
+    List<String> storeIds,
+  ) {
     final items = <PowerBICategoryItem>[];
     if (json['items'] != null) {
       items.addAll(
@@ -74,15 +81,39 @@ class PowerBICategory {
 
     final storeSales = <String, double>{};
     for (final storeId in storeIds) {
-      storeSales[storeId] = _parseDouble(json[storeId] ?? json['store_$storeId']);
+      // Try multiple possible column name formats
+      final safeId = storeId.replaceAll(RegExp(r'[^\w]'), '_');
+      final value = _parseDouble(
+        json['Store_$safeId'] ??
+            json[storeId] ??
+            json['store_$storeId'] ??
+            json['[$storeId]'],
+      );
+      storeSales[storeId] = value;
     }
 
+    final totalSales = _parseDouble(
+      json['Total'] ?? json['total'] ?? json['TotalSales'],
+    );
+
+    print(
+      'Category ${json['CategoryName']}: storeSales=$storeSales, total=$totalSales',
+    );
+
     return PowerBICategory(
-      categoryId: json['CategoryID']?.toString() ?? json['categoryId']?.toString() ?? '',
-      categoryName: json['CategoryName']?.toString() ?? json['categoryName']?.toString() ?? 'Unknown',
+      categoryId:
+          json['CategoryID']?.toString() ??
+          json['categoryId']?.toString() ??
+          json['CategoryName']?.toString() ??
+          json['categoryName']?.toString() ??
+          '',
+      categoryName:
+          json['CategoryName']?.toString() ??
+          json['categoryName']?.toString() ??
+          'Unknown',
       items: items,
       storeSales: storeSales,
-      totalSales: _parseDouble(json['Total'] ?? json['total'] ?? json['TotalSales']),
+      totalSales: totalSales,
     );
   }
 
@@ -107,18 +138,39 @@ class PowerBICategoryItem {
     this.isExpanded = false,
   });
 
-  factory PowerBICategoryItem.fromJson(Map<String, dynamic> json, List<String> storeIds) {
+  factory PowerBICategoryItem.fromJson(
+    Map<String, dynamic> json,
+    List<String> storeIds,
+  ) {
     final storeSales = <String, double>{};
     for (final storeId in storeIds) {
-      storeSales[storeId] = _parseDouble(json[storeId] ?? json['store_$storeId']);
+      // Try multiple possible column name formats
+      final safeId = storeId.replaceAll(RegExp(r'[^\w]'), '_');
+      storeSales[storeId] = _parseDouble(
+        json['Store_$safeId'] ??
+            json[storeId] ??
+            json['store_$storeId'] ??
+            json['[$storeId]'],
+      );
     }
 
     return PowerBICategoryItem(
-      itemId: json['ItemID']?.toString() ?? json['itemId']?.toString() ?? json['ProductID']?.toString() ?? '',
-      itemName: json['ItemName']?.toString() ?? json['itemName']?.toString() ?? json['ProductName']?.toString() ?? 'Unknown',
+      itemId:
+          json['ItemID']?.toString() ??
+          json['itemId']?.toString() ??
+          json['ProductID']?.toString() ??
+          json['ItemName']?.toString() ??
+          '',
+      itemName:
+          json['ItemName']?.toString() ??
+          json['itemName']?.toString() ??
+          json['ProductName']?.toString() ??
+          'Unknown',
       type: json['Type']?.toString() ?? json['type']?.toString() ?? 'product',
       storeSales: storeSales,
-      totalSales: _parseDouble(json['Total'] ?? json['total'] ?? json['TotalSales']),
+      totalSales: _parseDouble(
+        json['Total'] ?? json['total'] ?? json['TotalSales'],
+      ),
     );
   }
 
@@ -170,19 +222,37 @@ class DynamicDateRange {
 
   /// Create "Last N Months/Days" range
   factory DynamicDateRange.last(int value, String unit) {
-    return DynamicDateRange(
-      type: 'last',
-      value: value,
-      unit: unit,
-    );
+    return DynamicDateRange(type: 'last', value: value, unit: unit);
+  }
+
+  /// Create "Last N Months" range
+  factory DynamicDateRange.lastNMonths(int months) {
+    return DynamicDateRange.last(months, 'months');
+  }
+
+  /// Create "Last N Days" range
+  factory DynamicDateRange.lastNDays(int days) {
+    return DynamicDateRange.last(days, 'days');
   }
 
   /// Create "This Month/Week/Year" range
   factory DynamicDateRange.current(String unit) {
-    return DynamicDateRange(
-      type: 'this',
-      unit: unit,
-    );
+    return DynamicDateRange(type: 'this', unit: unit);
+  }
+
+  /// Create "This Month" range
+  factory DynamicDateRange.thisMonth() {
+    return DynamicDateRange.current('month');
+  }
+
+  /// Create "This Quarter" range
+  factory DynamicDateRange.thisQuarter() {
+    return DynamicDateRange.current('quarter');
+  }
+
+  /// Create "This Year" range
+  factory DynamicDateRange.thisYear() {
+    return DynamicDateRange.current('year');
   }
 
   /// Create custom date range
@@ -197,11 +267,11 @@ class DynamicDateRange {
   /// Calculate actual date range
   Map<String, DateTime> getDateRange() {
     final now = DateTime.now();
-    
+
     if (type == 'custom' && startDate != null && endDate != null) {
       return {'start': startDate!, 'end': endDate!};
     }
-    
+
     if (type == 'last' && value != null && unit != null) {
       DateTime start;
       switch (unit) {
@@ -219,14 +289,11 @@ class DynamicDateRange {
       }
       return {'start': start, 'end': now};
     }
-    
+
     if (type == 'this') {
       switch (unit) {
         case 'month':
-          return {
-            'start': DateTime(now.year, now.month, 1),
-            'end': now,
-          };
+          return {'start': DateTime(now.year, now.month, 1), 'end': now};
         case 'week':
           final weekStart = now.subtract(Duration(days: now.weekday - 1));
           return {
@@ -234,13 +301,10 @@ class DynamicDateRange {
             'end': now,
           };
         case 'year':
-          return {
-            'start': DateTime(now.year, 1, 1),
-            'end': now,
-          };
+          return {'start': DateTime(now.year, 1, 1), 'end': now};
       }
     }
-    
+
     return {'start': now, 'end': now};
   }
 

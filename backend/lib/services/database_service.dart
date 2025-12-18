@@ -245,7 +245,7 @@ class DatabaseService {
           'CustomerId': index + 1,
           'CustomerName': 'Customer ${index + 1}',
           'Email': 'customer${index + 1}@example.com',
-          'Phone': '555-000${index}',
+          'Phone': '555-000$index',
         };
       });
     }

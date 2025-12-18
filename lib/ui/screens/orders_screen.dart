@@ -125,7 +125,6 @@ class _OrderCard extends StatelessWidget {
     final theme = Theme.of(context);
     final dateFormat = DateFormat('MMM dd, yyyy');
     final timeFormat = DateFormat('hh:mm a');
-    final currencyFormat = NumberFormat.currency(symbol: '\$');
 
     return Card(
       margin: const EdgeInsets.only(bottom: 12),
