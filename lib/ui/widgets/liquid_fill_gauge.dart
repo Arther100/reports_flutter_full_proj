@@ -341,16 +341,9 @@ class LiquidGaugeRow extends StatelessWidget {
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              Icon(
-                Icons.water_drop_outlined,
-                size: 48,
-                color: Colors.grey[400],
-              ),
+              Icon(Icons.water_drop_outlined, size: 48, color: Colors.black54),
               const SizedBox(height: 8),
-              Text(
-                'No data available',
-                style: TextStyle(color: Colors.grey[600]),
-              ),
+              Text('No data available', style: TextStyle(color: Colors.black)),
             ],
           ),
         ),
@@ -429,15 +422,11 @@ class _InteractiveLiquidGaugeCardState
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              Icon(
-                Icons.water_drop_outlined,
-                size: 48,
-                color: Colors.grey[500],
-              ),
+              Icon(Icons.water_drop_outlined, size: 48, color: Colors.black),
               const SizedBox(height: 8),
               Text(
                 'No data available',
-                style: TextStyle(color: Colors.grey[400]),
+                style: TextStyle(color: Colors.black54),
               ),
             ],
           ),

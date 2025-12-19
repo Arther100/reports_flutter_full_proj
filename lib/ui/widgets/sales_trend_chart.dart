@@ -737,7 +737,7 @@ class _SalesTrendChartState extends State<SalesTrendChart> {
               const SizedBox(height: 6),
               Text(
                 'No sales trend data available',
-                style: TextStyle(color: Colors.grey.shade600, fontSize: 12),
+                style: TextStyle(color: Colors.black, fontSize: 12),
               ),
             ],
           ),

@@ -256,7 +256,7 @@ class _CategorySalesChartState extends State<CategorySalesChart>
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Icon(Icons.bar_chart, size: 48, color: Colors.grey[500]),
+            Icon(Icons.bar_chart, size: 48, color: Colors.black),
             const SizedBox(height: 8),
             Text(
               'No data available',

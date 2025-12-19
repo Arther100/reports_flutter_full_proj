@@ -79,7 +79,7 @@ class _OrdersScreenState extends State<OrdersScreen> {
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Icon(Icons.inbox, size: 64, color: Colors.grey),
+                  Icon(Icons.inbox, size: 64, color: Colors.black),
                   SizedBox(height: 16),
                   Text('No orders found'),
                 ],
@@ -154,14 +154,14 @@ class _OrderCard extends StatelessWidget {
             // Date and Time
             Row(
               children: [
-                Icon(Icons.calendar_today, size: 16, color: Colors.grey[600]),
+                Icon(Icons.calendar_today, size: 16, color: Colors.black),
                 const SizedBox(width: 8),
                 Text(
                   dateFormat.format(order.transDate),
                   style: theme.textTheme.bodyMedium,
                 ),
                 const SizedBox(width: 16),
-                Icon(Icons.access_time, size: 16, color: Colors.grey[600]),
+                Icon(Icons.access_time, size: 16, color: Colors.black),
                 const SizedBox(width: 8),
                 Text(
                   timeFormat.format(order.transDate),
@@ -174,7 +174,7 @@ class _OrderCard extends StatelessWidget {
             // Payment Mode
             Row(
               children: [
-                Icon(Icons.payment, size: 16, color: Colors.grey[600]),
+                Icon(Icons.payment, size: 16, color: Colors.black),
                 const SizedBox(width: 8),
                 Text(order.paymentModeText, style: theme.textTheme.bodyMedium),
                 if (order.isPOS) ...[
@@ -300,7 +300,7 @@ class _AmountItem extends StatelessWidget {
       children: [
         Text(
           label,
-          style: theme.textTheme.bodySmall?.copyWith(color: Colors.grey[600]),
+          style: theme.textTheme.bodySmall?.copyWith(color: Colors.black),
         ),
         const SizedBox(height: 4),
         Text(

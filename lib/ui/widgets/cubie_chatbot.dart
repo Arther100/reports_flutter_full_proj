@@ -581,7 +581,7 @@ class _CubieChatbotState extends State<CubieChatbot>
                 question.question,
                 style: const TextStyle(
                   fontSize: 13,
-                  color: Colors.black87,
+                  color: Colors.black,
                   fontWeight: FontWeight.w500,
                 ),
               ),

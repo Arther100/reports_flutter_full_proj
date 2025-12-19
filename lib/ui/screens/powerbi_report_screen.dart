@@ -10,6 +10,7 @@ import '../widgets/liquid_fill_gauge.dart';
 import '../widgets/category_gauge_chart.dart';
 import '../widgets/sales_trend_chart.dart';
 import '../widgets/cubie_chatbot.dart';
+import '../widgets/powerbi_shimmer_loading.dart';
 import 'package:intl/intl.dart';
 
 class PowerBIReportScreen extends StatefulWidget {
@@ -80,11 +81,12 @@ class _PowerBIReportScreenState extends State<PowerBIReportScreen> {
           _summary = null;
         });
       }
-      _loadInitialData();
+      // Defer loading to not block UI
+      Future.microtask(() => _loadInitialData());
     } else if (dbProvider.isPowerBIDatabase && !_isLoading && _stores.isEmpty) {
-      // Initial load
+      // Initial load - defer to not block first frame
       _lastDatabaseId = dbProvider.currentDatabase?.id;
-      _loadInitialData();
+      Future.microtask(() => _loadInitialData());
     }
   }
 
@@ -617,7 +619,7 @@ class _PowerBIReportScreenState extends State<PowerBIReportScreen> {
                             const SizedBox(height: 16),
                             Text(
                               'Loading details...',
-                              style: TextStyle(color: Colors.grey[600]),
+                              style: TextStyle(color: Colors.black),
                             ),
                           ],
                         ),
@@ -637,7 +639,7 @@ class _PowerBIReportScreenState extends State<PowerBIReportScreen> {
                               'No detailed data available',
                               style: TextStyle(
                                 fontSize: 16,
-                                color: Colors.grey[600],
+                                color: Colors.black,
                               ),
                             ),
                           ],
@@ -861,7 +863,7 @@ class _PowerBIReportScreenState extends State<PowerBIReportScreen> {
                   style: TextStyle(
                     fontSize: isMobile ? 14 : 16,
                     fontWeight: FontWeight.bold,
-                    color: Colors.black87,
+                    color: Colors.black,
                   ),
                 ),
               ),
@@ -889,7 +891,7 @@ class _PowerBIReportScreenState extends State<PowerBIReportScreen> {
                             style: TextStyle(
                               fontSize: isMobile ? 11 : 13,
                               fontWeight: FontWeight.w500,
-                              color: Colors.black87,
+                              color: Colors.black,
                             ),
                             overflow: TextOverflow.ellipsis,
                           ),
@@ -979,7 +981,7 @@ class _PowerBIReportScreenState extends State<PowerBIReportScreen> {
                     style: TextStyle(
                       fontSize: isMobile ? 14 : 16,
                       fontWeight: FontWeight.bold,
-                      color: Colors.black87,
+                      color: Colors.black,
                     ),
                   ),
                 ),
@@ -1036,7 +1038,7 @@ class _PowerBIReportScreenState extends State<PowerBIReportScreen> {
                               style: const TextStyle(
                                 fontSize: 12,
                                 fontWeight: FontWeight.w500,
-                                color: Colors.black87,
+                                color: Colors.black,
                               ),
                               overflow: TextOverflow.ellipsis,
                             ),
@@ -1044,7 +1046,7 @@ class _PowerBIReportScreenState extends State<PowerBIReportScreen> {
                               date,
                               style: TextStyle(
                                 fontSize: 10,
-                                color: Colors.black87,
+                                color: Colors.black,
                               ),
                             ),
                           ],
@@ -1157,7 +1159,7 @@ class _PowerBIReportScreenState extends State<PowerBIReportScreen> {
                           orderId.length > 8
                               ? '${orderId.substring(0, 8)}...'
                               : orderId,
-                          style: TextStyle(fontSize: 13, color: Colors.black87),
+                          style: TextStyle(fontSize: 13, color: Colors.black),
                         ),
                       ),
                       Expanded(
@@ -1174,7 +1176,7 @@ class _PowerBIReportScreenState extends State<PowerBIReportScreen> {
                         width: 100,
                         child: Text(
                           date,
-                          style: TextStyle(fontSize: 13, color: Colors.black87),
+                          style: TextStyle(fontSize: 13, color: Colors.black),
                         ),
                       ),
                       SizedBox(
@@ -1254,7 +1256,7 @@ class _PowerBIReportScreenState extends State<PowerBIReportScreen> {
                           style: TextStyle(
                             fontSize: 16,
                             fontWeight: FontWeight.bold,
-                            color: Colors.black87,
+                            color: Colors.black,
                           ),
                         ),
                       ),
@@ -1381,7 +1383,7 @@ class _PowerBIReportScreenState extends State<PowerBIReportScreen> {
                                     : orderId,
                                 style: TextStyle(
                                   fontSize: 13,
-                                  color: Colors.black87,
+                                  color: Colors.black,
                                 ),
                               ),
                             ),
@@ -1401,7 +1403,7 @@ class _PowerBIReportScreenState extends State<PowerBIReportScreen> {
                                 date,
                                 style: TextStyle(
                                   fontSize: 13,
-                                  color: Colors.black87,
+                                  color: Colors.black,
                                 ),
                               ),
                             ),
@@ -1489,7 +1491,7 @@ class _PowerBIReportScreenState extends State<PowerBIReportScreen> {
                   style: TextStyle(
                     fontSize: isMobile ? 14 : 16,
                     fontWeight: FontWeight.bold,
-                    color: Colors.black87,
+                    color: Colors.black,
                   ),
                 ),
               ),
@@ -1528,7 +1530,7 @@ class _PowerBIReportScreenState extends State<PowerBIReportScreen> {
                             'Discounts',
                             style: TextStyle(
                               fontSize: isMobile ? 10 : 12,
-                              color: Colors.black87,
+                              color: Colors.black,
                             ),
                           ),
                         ],
@@ -1611,7 +1613,7 @@ class _PowerBIReportScreenState extends State<PowerBIReportScreen> {
                     style: TextStyle(
                       fontSize: isMobile ? 14 : 16,
                       fontWeight: FontWeight.bold,
-                      color: Colors.black87,
+                      color: Colors.black,
                     ),
                   ),
                 ),
@@ -1678,10 +1680,7 @@ class _PowerBIReportScreenState extends State<PowerBIReportScreen> {
                         children: [
                           Text(
                             'Applied: $timesApplied',
-                            style: TextStyle(
-                              fontSize: 10,
-                              color: Colors.black87,
-                            ),
+                            style: TextStyle(fontSize: 10, color: Colors.black),
                           ),
                         ],
                       ),
@@ -1817,7 +1816,7 @@ class _PowerBIReportScreenState extends State<PowerBIReportScreen> {
                               timesApplied.toString(),
                               style: TextStyle(
                                 fontSize: 13,
-                                color: Colors.black87,
+                                color: Colors.black,
                               ),
                               textAlign: TextAlign.center,
                             ),
@@ -1828,7 +1827,7 @@ class _PowerBIReportScreenState extends State<PowerBIReportScreen> {
                               orders.toString(),
                               style: TextStyle(
                                 fontSize: 13,
-                                color: Colors.black87,
+                                color: Colors.black,
                               ),
                               textAlign: TextAlign.center,
                             ),
@@ -1931,7 +1930,7 @@ class _PowerBIReportScreenState extends State<PowerBIReportScreen> {
                           style: TextStyle(
                             fontSize: 16,
                             fontWeight: FontWeight.bold,
-                            color: Colors.black87,
+                            color: Colors.black,
                           ),
                         ),
                       ),
@@ -2051,7 +2050,7 @@ class _PowerBIReportScreenState extends State<PowerBIReportScreen> {
                                     timesApplied.toString(),
                                     style: TextStyle(
                                       fontSize: 13,
-                                      color: Colors.black87,
+                                      color: Colors.black,
                                     ),
                                     textAlign: TextAlign.center,
                                   ),
@@ -2062,7 +2061,7 @@ class _PowerBIReportScreenState extends State<PowerBIReportScreen> {
                                     orders.toString(),
                                     style: TextStyle(
                                       fontSize: 13,
-                                      color: Colors.black87,
+                                      color: Colors.black,
                                     ),
                                     textAlign: TextAlign.center,
                                   ),
@@ -2339,7 +2338,7 @@ class _PowerBIReportScreenState extends State<PowerBIReportScreen> {
                                 SizedBox(height: 12),
                                 Text(
                                   'No stores found',
-                                  style: TextStyle(color: Colors.grey[500]),
+                                  style: TextStyle(color: Colors.black),
                                 ),
                               ],
                             ),
@@ -2382,7 +2381,7 @@ class _PowerBIReportScreenState extends State<PowerBIReportScreen> {
                                     ? Text(
                                         store.city!,
                                         style: TextStyle(
-                                          color: Colors.grey[600],
+                                          color: Colors.black,
                                           fontSize: isMobile ? 11 : 12,
                                         ),
                                       )
@@ -2459,24 +2458,14 @@ class _PowerBIReportScreenState extends State<PowerBIReportScreen> {
   @override
   Widget build(BuildContext context) {
     final dbProvider = context.watch<DatabaseProvider>();
+    final screenWidth = MediaQuery.of(context).size.width;
+    final isMobile = screenWidth < 600;
 
-    // Show loading if database is being switched
-    if (dbProvider.isLoading && !dbProvider.isPowerBIDatabase) {
+    // Show shimmer loading whenever loading AND no data available yet
+    if (_isLoading && (_categories.isEmpty || _stores.isEmpty)) {
       return Scaffold(
-        backgroundColor: const Color(0xFF1A1A2E),
-        body: Center(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              CircularProgressIndicator(color: Color(0xFF667EEA)),
-              const SizedBox(height: 16),
-              Text(
-                'Loading data...',
-                style: TextStyle(fontSize: 16, color: Colors.grey[400]),
-              ),
-            ],
-          ),
-        ),
+        backgroundColor: Colors.grey[50],
+        body: SafeArea(child: PowerBIShimmerLoading(isMobile: isMobile)),
       );
     }
 
@@ -2523,7 +2512,7 @@ class _PowerBIReportScreenState extends State<PowerBIReportScreen> {
                   ),
                   Text(
                     dbProvider.currentDatabase?.name ?? 'No database',
-                    style: TextStyle(fontSize: 12, color: Colors.grey[600]),
+                    style: TextStyle(fontSize: 12, color: Colors.black),
                   ),
                 ],
               ),
@@ -2637,54 +2626,18 @@ class _PowerBIReportScreenState extends State<PowerBIReportScreen> {
                 ],
               ),
             ),
-            // Loading overlay - shown during filter updates
-            if (_isLoading)
-              Positioned.fill(
+            // Minimal shimmer overlay - shown during filter updates (non-blocking)
+            if (_isLoading && _categories.isNotEmpty)
+              Positioned(
+                top: 0,
+                left: 0,
+                right: 0,
                 child: Container(
-                  color: Colors.black.withValues(alpha: 0.3),
-                  child: Center(
-                    child: Container(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 32,
-                        vertical: 24,
-                      ),
-                      decoration: BoxDecoration(
-                        color: Colors.white,
-                        borderRadius: BorderRadius.circular(16),
-                        boxShadow: [
-                          BoxShadow(
-                            color: Colors.black.withValues(alpha: 0.15),
-                            blurRadius: 20,
-                            offset: const Offset(0, 8),
-                          ),
-                        ],
-                      ),
-                      child: Column(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          CircularProgressIndicator(
-                            color: Colors.blue[700],
-                            strokeWidth: 3,
-                          ),
-                          const SizedBox(height: 16),
-                          Text(
-                            'Updating data...',
-                            style: TextStyle(
-                              fontSize: 16,
-                              fontWeight: FontWeight.w600,
-                              color: Colors.grey[800],
-                            ),
-                          ),
-                          const SizedBox(height: 4),
-                          Text(
-                            'Please wait',
-                            style: TextStyle(
-                              fontSize: 13,
-                              color: Colors.grey[500],
-                            ),
-                          ),
-                        ],
-                      ),
+                  height: 3,
+                  child: LinearProgressIndicator(
+                    backgroundColor: Colors.transparent,
+                    valueColor: AlwaysStoppedAnimation<Color>(
+                      Colors.blue[700]!,
                     ),
                   ),
                 ),
@@ -3372,7 +3325,7 @@ class _PowerBIReportScreenState extends State<PowerBIReportScreen> {
                                 SizedBox(height: 12),
                                 Text(
                                   'No categories found',
-                                  style: TextStyle(color: Colors.grey[500]),
+                                  style: TextStyle(color: Colors.black),
                                 ),
                               ],
                             ),
@@ -3417,7 +3370,7 @@ class _PowerBIReportScreenState extends State<PowerBIReportScreen> {
                                 subtitle: Text(
                                   '\$${_currencyFormat.format(category.totalSales).replaceAll('\$', '')}',
                                   style: TextStyle(
-                                    color: Colors.grey[600],
+                                    color: Colors.black,
                                     fontSize: isMobile ? 11 : 12,
                                   ),
                                 ),
@@ -3711,7 +3664,7 @@ class _PowerBIReportScreenState extends State<PowerBIReportScreen> {
         SizedBox(height: isMobile ? 12 : (isWideScreen ? 24 : 16)),
 
         // Charts Row (includes Sales Trend Chart on right side)
-        if (_categories.isNotEmpty || _salesTrendData.isNotEmpty)
+        if (_categories.isNotEmpty || _salesTrendData.isNotEmpty || _isLoading)
           _buildChartsRow(screenWidth, screenHeight, isMobile: isMobile),
         SizedBox(height: isMobile ? 12 : (isWideScreen ? 24 : 16)),
 
@@ -3746,7 +3699,7 @@ class _PowerBIReportScreenState extends State<PowerBIReportScreen> {
                 'No discount data available',
                 style: TextStyle(
                   fontSize: isMobile ? 16 : 18,
-                  color: Colors.grey[600],
+                  color: Colors.black,
                   fontWeight: FontWeight.w500,
                 ),
                 textAlign: TextAlign.center,
@@ -3756,7 +3709,7 @@ class _PowerBIReportScreenState extends State<PowerBIReportScreen> {
                 'Select filters to view discount report',
                 style: TextStyle(
                   fontSize: isMobile ? 12 : 14,
-                  color: Colors.grey[500],
+                  color: Colors.black,
                 ),
                 textAlign: TextAlign.center,
               ),
@@ -3918,7 +3871,7 @@ class _PowerBIReportScreenState extends State<PowerBIReportScreen> {
                               if (pieData.isEmpty) {
                                 return const Text(
                                   'No data',
-                                  style: TextStyle(color: Colors.grey),
+                                  style: TextStyle(color: Colors.black),
                                 );
                               }
                               return CustomPaint(
@@ -3949,7 +3902,7 @@ class _PowerBIReportScreenState extends State<PowerBIReportScreen> {
                               return const Center(
                                 child: Text(
                                   'No data',
-                                  style: TextStyle(color: Colors.grey),
+                                  style: TextStyle(color: Colors.black),
                                 ),
                               );
                             }
@@ -3997,7 +3950,7 @@ class _PowerBIReportScreenState extends State<PowerBIReportScreen> {
                                       name,
                                       style: const TextStyle(
                                         fontSize: 12,
-                                        color: Colors.black87,
+                                        color: Colors.black,
                                       ),
                                       overflow: TextOverflow.ellipsis,
                                     ),
@@ -4052,7 +4005,7 @@ class _PowerBIReportScreenState extends State<PowerBIReportScreen> {
                         '${name.length > 10 ? '${name.substring(0, 10)}...' : name} ${percent.toStringAsFixed(0)}%',
                         style: const TextStyle(
                           fontSize: 10,
-                          color: Colors.black87,
+                          color: Colors.black,
                         ),
                       ),
                     ],
@@ -4225,7 +4178,7 @@ class _PowerBIReportScreenState extends State<PowerBIReportScreen> {
                           name,
                           style: const TextStyle(
                             fontSize: 14,
-                            color: Colors.black87,
+                            color: Colors.black,
                             fontWeight: FontWeight.w500,
                           ),
                           overflow: TextOverflow.ellipsis,
@@ -4457,7 +4410,7 @@ class _PowerBIReportScreenState extends State<PowerBIReportScreen> {
                           name,
                           style: const TextStyle(
                             fontSize: 14,
-                            color: Colors.black87,
+                            color: Colors.black,
                             fontWeight: FontWeight.w500,
                           ),
                           overflow: TextOverflow.ellipsis,
@@ -4615,10 +4568,7 @@ class _PowerBIReportScreenState extends State<PowerBIReportScreen> {
                     flex: 3,
                     child: Text(
                       name,
-                      style: const TextStyle(
-                        fontSize: 14,
-                        color: Colors.black87,
-                      ),
+                      style: const TextStyle(fontSize: 14, color: Colors.black),
                     ),
                   ),
                   SizedBox(
@@ -4808,7 +4758,7 @@ class _PowerBIReportScreenState extends State<PowerBIReportScreen> {
                   title,
                   style: TextStyle(
                     fontSize: isMobile ? 10 : 12,
-                    color: Colors.grey[700],
+                    color: Colors.black,
                     fontWeight: FontWeight.w500,
                   ),
                   overflow: TextOverflow.ellipsis,
@@ -5022,7 +4972,7 @@ class _PowerBIReportScreenState extends State<PowerBIReportScreen> {
               style: TextStyle(
                 fontSize: 13,
                 fontWeight: FontWeight.w600,
-                color: Colors.grey[700],
+                color: Colors.black,
                 letterSpacing: 0.5,
               ),
             ),
@@ -5138,7 +5088,7 @@ class _PowerBIReportScreenState extends State<PowerBIReportScreen> {
               style: TextStyle(
                 fontSize: 13,
                 fontWeight: FontWeight.w600,
-                color: Colors.grey[700],
+                color: Colors.black,
                 letterSpacing: 0.5,
               ),
             ),
@@ -5185,12 +5135,12 @@ class _PowerBIReportScreenState extends State<PowerBIReportScreen> {
                     style: TextStyle(
                       fontSize: 14,
                       fontWeight: FontWeight.w600,
-                      color: Colors.grey[800],
+                      color: Colors.black,
                     ),
                   ),
                   Text(
                     'of ${_stores.length} stores',
-                    style: TextStyle(fontSize: 11, color: Colors.grey[500]),
+                    style: TextStyle(fontSize: 11, color: Colors.black),
                   ),
                 ],
               ),
@@ -5241,12 +5191,12 @@ class _PowerBIReportScreenState extends State<PowerBIReportScreen> {
                     style: TextStyle(
                       fontSize: 14,
                       fontWeight: FontWeight.w600,
-                      color: Colors.grey[800],
+                      color: Colors.black,
                     ),
                   ),
                   Text(
                     '${_categories.length} available',
-                    style: TextStyle(fontSize: 11, color: Colors.grey[500]),
+                    style: TextStyle(fontSize: 11, color: Colors.black),
                   ),
                 ],
               ),
@@ -5293,12 +5243,12 @@ class _PowerBIReportScreenState extends State<PowerBIReportScreen> {
                     style: TextStyle(
                       fontSize: 14,
                       fontWeight: FontWeight.w600,
-                      color: Colors.grey[800],
+                      color: Colors.black,
                     ),
                   ),
                   Text(
                     'Tap to change',
-                    style: TextStyle(fontSize: 11, color: Colors.grey[500]),
+                    style: TextStyle(fontSize: 11, color: Colors.black),
                   ),
                 ],
               ),
@@ -5380,7 +5330,7 @@ class _PowerBIReportScreenState extends State<PowerBIReportScreen> {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
-        Text(label, style: TextStyle(fontSize: 12, color: Colors.grey[600])),
+        Text(label, style: TextStyle(fontSize: 12, color: Colors.black)),
         Container(
           padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
           decoration: BoxDecoration(
@@ -5445,7 +5395,7 @@ class _PowerBIReportScreenState extends State<PowerBIReportScreen> {
                   style: TextStyle(
                     fontSize: 14,
                     fontWeight: FontWeight.w500,
-                    color: Colors.grey[800],
+                    color: Colors.black,
                   ),
                   items: durations.map((String duration) {
                     return DropdownMenuItem<String>(
@@ -5505,7 +5455,7 @@ class _PowerBIReportScreenState extends State<PowerBIReportScreen> {
                 overflow: TextOverflow.ellipsis,
               ),
             ),
-            Icon(Icons.arrow_drop_down, color: Colors.grey[600]),
+            Icon(Icons.arrow_drop_down, color: Colors.black),
           ],
         ),
       ),
@@ -5540,7 +5490,7 @@ class _PowerBIReportScreenState extends State<PowerBIReportScreen> {
                 overflow: TextOverflow.ellipsis,
               ),
             ),
-            Icon(Icons.arrow_drop_down, color: Colors.grey[600]),
+            Icon(Icons.arrow_drop_down, color: Colors.black),
           ],
         ),
       ),
@@ -5639,15 +5589,12 @@ class _PowerBIReportScreenState extends State<PowerBIReportScreen> {
             style: TextStyle(
               fontSize: isMobile ? 22 : 28,
               fontWeight: FontWeight.bold,
-              color: Colors.grey[800],
+              color: Colors.black,
             ),
           ),
           Text(
             'Stores',
-            style: TextStyle(
-              fontSize: isMobile ? 9 : 11,
-              color: Colors.grey[500],
-            ),
+            style: TextStyle(fontSize: isMobile ? 9 : 11, color: Colors.black),
           ),
         ],
       ),
@@ -5663,7 +5610,18 @@ class _PowerBIReportScreenState extends State<PowerBIReportScreen> {
               .toList();
     final topCategories = filteredCategories.take(6).toList();
 
-    if (topCategories.isEmpty) {
+    // Show shimmer while loading
+    if (topCategories.isEmpty && _isLoading) {
+      return Card(
+        elevation: 4,
+        child: Container(
+          padding: EdgeInsets.all(isMobile ? 24 : 40),
+          child: const Center(child: CircularProgressIndicator()),
+        ),
+      );
+    }
+
+    if (topCategories.isEmpty && !_isLoading) {
       return Card(
         elevation: 4,
         child: Container(
@@ -5675,13 +5633,13 @@ class _PowerBIReportScreenState extends State<PowerBIReportScreen> {
                 Icon(
                   Icons.donut_large,
                   size: isMobile ? 36 : 48,
-                  color: Colors.grey[400],
+                  color: Colors.black,
                 ),
                 const SizedBox(height: 8),
                 Text(
                   'No data available',
                   style: TextStyle(
-                    color: Colors.grey[600],
+                    color: Colors.black,
                     fontSize: isMobile ? 12 : 14,
                   ),
                 ),
@@ -5727,13 +5685,13 @@ class _PowerBIReportScreenState extends State<PowerBIReportScreen> {
                 Icon(
                   Icons.trending_up,
                   size: isMobile ? 36 : 48,
-                  color: Colors.grey[400],
+                  color: Colors.black,
                 ),
                 const SizedBox(height: 8),
                 Text(
                   'No sales trend data available',
                   style: TextStyle(
-                    color: Colors.grey[600],
+                    color: Colors.black,
                     fontSize: isMobile ? 12 : 14,
                   ),
                 ),
@@ -5754,13 +5712,25 @@ class _PowerBIReportScreenState extends State<PowerBIReportScreen> {
   }
 
   Widget _buildModernDataTable() {
+    // Show shimmer while loading
+    if (_isLoading && _categories.isEmpty) {
+      return Container(
+        height: 400,
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(16),
+        ),
+        child: const Center(child: CircularProgressIndicator()),
+      );
+    }
+
     if (_categories.isEmpty && !_isLoading) {
       return Center(
         child: Padding(
           padding: const EdgeInsets.all(48),
           child: Text(
             'No data available for the selected date range',
-            style: TextStyle(fontSize: 16, color: Colors.grey[600]),
+            style: TextStyle(fontSize: 16, color: Colors.black),
           ),
         ),
       );
@@ -6343,13 +6313,13 @@ class _PowerBIReportScreenState extends State<PowerBIReportScreen> {
               style: TextStyle(
                 fontSize: 20,
                 fontWeight: FontWeight.bold,
-                color: Colors.grey[800],
+                color: Colors.black,
               ),
             ),
             const SizedBox(height: 8),
             Text(
               _error ?? 'Unknown error',
-              style: TextStyle(fontSize: 14, color: Colors.grey[600]),
+              style: TextStyle(fontSize: 14, color: Colors.black),
               textAlign: TextAlign.center,
             ),
             const SizedBox(height: 24),
@@ -6484,7 +6454,7 @@ class _StoreSelectionDialogState extends State<_StoreSelectionDialog> {
                     icon: const Icon(Icons.clear, size: 18),
                     label: const Text('Clear'),
                     style: OutlinedButton.styleFrom(
-                      foregroundColor: Colors.grey[700],
+                      foregroundColor: Colors.black,
                       side: BorderSide(color: Colors.grey[300]!),
                     ),
                   ),
@@ -6549,7 +6519,7 @@ class _StoreSelectionDialogState extends State<_StoreSelectionDialog> {
                               store.city!,
                               style: TextStyle(
                                 fontSize: 13,
-                                color: Colors.grey[600],
+                                color: Colors.black,
                               ),
                             )
                           : null,
@@ -6592,7 +6562,7 @@ class _StoreSelectionDialogState extends State<_StoreSelectionDialog> {
                   TextButton(
                     onPressed: () => Navigator.of(context).pop(),
                     style: TextButton.styleFrom(
-                      foregroundColor: Colors.grey[700],
+                      foregroundColor: Colors.black,
                       padding: const EdgeInsets.symmetric(
                         horizontal: 24,
                         vertical: 12,
@@ -6784,7 +6754,7 @@ class _CategorySelectionDialogState extends State<_CategorySelectionDialog> {
                     icon: const Icon(Icons.clear, size: 18),
                     label: const Text('Clear All'),
                     style: OutlinedButton.styleFrom(
-                      foregroundColor: Colors.grey[700],
+                      foregroundColor: Colors.black,
                       side: BorderSide(color: Colors.grey[300]!),
                       padding: const EdgeInsets.symmetric(
                         horizontal: 16,
@@ -6877,7 +6847,7 @@ class _CategorySelectionDialogState extends State<_CategorySelectionDialog> {
                                 border: Border.all(
                                   color: isSelected
                                       ? Colors.green[600]!
-                                      : Colors.grey[400]!,
+                                      : Colors.black87,
                                   width: 2,
                                 ),
                               ),
@@ -6926,7 +6896,7 @@ class _CategorySelectionDialogState extends State<_CategorySelectionDialog> {
                   TextButton(
                     onPressed: () => Navigator.of(context).pop(),
                     style: TextButton.styleFrom(
-                      foregroundColor: Colors.grey[700],
+                      foregroundColor: Colors.black,
                       padding: const EdgeInsets.symmetric(
                         horizontal: 24,
                         vertical: 12,
@@ -7176,7 +7146,7 @@ class _DurationSelectionDialogState extends State<_DurationSelectionDialog> {
                   TextButton(
                     onPressed: () => Navigator.of(context).pop(),
                     style: TextButton.styleFrom(
-                      foregroundColor: Colors.grey[700],
+                      foregroundColor: Colors.black,
                       padding: const EdgeInsets.symmetric(
                         horizontal: 24,
                         vertical: 12,

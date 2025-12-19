@@ -26,7 +26,8 @@ class _AnalyticsDashboardScreenState extends State<AnalyticsDashboardScreen>
   @override
   void initState() {
     super.initState();
-    WidgetsBinding.instance.addPostFrameCallback((_) {
+    // Defer data loading to allow UI to render first
+    Future.microtask(() {
       _loadDataIfNeeded();
     });
   }
@@ -44,35 +45,14 @@ class _AnalyticsDashboardScreenState extends State<AnalyticsDashboardScreen>
   Widget build(BuildContext context) {
     final dbProvider = context.watch<DatabaseProvider>();
 
-    // Show loading if database is being switched
-    if (dbProvider.isLoading && !dbProvider.isPOSDatabase) {
-      return Scaffold(
-        body: Center(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              CircularProgressIndicator(),
-              const SizedBox(height: 16),
-              Text(
-                'Switching to POS Database...',
-                style: TextStyle(fontSize: 16, color: Colors.grey[700]),
-              ),
-            ],
-          ),
-        ),
-      );
-    }
-
-    // Check if database changed and reload data
+    // Check if database changed and reload data (deferred)
     if (dbProvider.isPOSDatabase &&
         dbProvider.currentDatabase?.id != _lastDatabaseId) {
-      WidgetsBinding.instance.addPostFrameCallback((_) {
-        _loadDataIfNeeded();
-      });
+      Future.microtask(() => _loadDataIfNeeded());
     }
 
-    // Check if we're on the wrong database (and not loading)
-    if (!dbProvider.isPOSDatabase) {
+    // Check if we're on the wrong database
+    if (!dbProvider.isPOSDatabase && dbProvider.hasDatabase) {
       return Scaffold(
         body: Center(
           child: Container(
@@ -99,13 +79,13 @@ class _AnalyticsDashboardScreenState extends State<AnalyticsDashboardScreen>
                   style: TextStyle(
                     fontSize: 20,
                     fontWeight: FontWeight.bold,
-                    color: Colors.grey[800],
+                    color: Colors.black,
                   ),
                 ),
                 const SizedBox(height: 8),
                 Text(
                   'POS Analytics requires the RuposPreProd database.\nCurrently connected to: ${dbProvider.currentDatabase?.name ?? "None"}',
-                  style: TextStyle(fontSize: 14, color: Colors.grey[600]),
+                  style: TextStyle(fontSize: 14, color: Colors.black),
                   textAlign: TextAlign.center,
                 ),
                 const SizedBox(height: 24),
@@ -145,31 +125,44 @@ class _AnalyticsDashboardScreenState extends State<AnalyticsDashboardScreen>
             return _buildShimmerLoading(context);
           }
 
-          return FilterLoadingOverlay(
-            isLoading:
-                provider.isLoading && provider.salesOverview.totalOrders > 0,
-            child: RefreshIndicator(
-              onRefresh: provider.loadDashboard,
-              child: CustomScrollView(
-                slivers: [
-                  _buildAppBar(context, provider),
-                  SliverToBoxAdapter(
-                    child: Column(
-                      children: [
-                        _buildFilterBar(context, provider),
-                        _buildOverallSummary(context, provider),
-                        _buildSalesTrendChart(context, provider),
-                        _buildComparisonChartsRow(context, provider),
-                        _buildHourlySalesHeatmap(context, provider),
-                        _buildSalesByTypeSection(context, provider),
-                        _buildTopPerformersSection(context, provider),
-                        const SizedBox(height: 80), // Space for FAB
-                      ],
+          return Stack(
+            children: [
+              RefreshIndicator(
+                onRefresh: provider.loadDashboard,
+                child: CustomScrollView(
+                  slivers: [
+                    _buildAppBar(context, provider),
+                    SliverToBoxAdapter(
+                      child: Column(
+                        children: [
+                          _buildFilterBar(context, provider),
+                          _buildOverallSummary(context, provider),
+                          _buildSalesTrendChart(context, provider),
+                          _buildComparisonChartsRow(context, provider),
+                          _buildHourlySalesHeatmap(context, provider),
+                          _buildSalesByTypeSection(context, provider),
+                          _buildTopPerformersSection(context, provider),
+                          const SizedBox(height: 80), // Space for FAB
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              // Subtle loading indicator for filter updates
+              if (provider.isLoading && provider.salesOverview.totalOrders > 0)
+                Positioned(
+                  top: 0,
+                  left: 0,
+                  right: 0,
+                  child: LinearProgressIndicator(
+                    backgroundColor: Colors.transparent,
+                    valueColor: AlwaysStoppedAnimation<Color>(
+                      Theme.of(context).colorScheme.primary,
                     ),
                   ),
-                ],
-              ),
-            ),
+                ),
+            ],
           );
         },
       ),
@@ -2682,7 +2675,7 @@ class _AnalyticsDashboardScreenState extends State<AnalyticsDashboardScreen>
   Widget _buildRankBadge(int rank) {
     final colors = [
       Colors.amber,
-      Colors.grey.shade400,
+      Colors.black87,
       Colors.brown.shade300,
       Colors.blue,
       Colors.purple,
@@ -3848,7 +3841,7 @@ class _AnalyticsDashboardScreenState extends State<AnalyticsDashboardScreen>
       case 'gold':
         return Colors.amber.shade700;
       case 'silver':
-        return Colors.grey.shade500;
+        return Colors.black87;
       default:
         return Colors.brown.shade400;
     }
@@ -4223,10 +4216,7 @@ Try asking one of the quick questions above or type your own!''';
                       ),
                       Text(
                         'Ask questions about your data',
-                        style: TextStyle(
-                          fontSize: 12,
-                          color: Colors.grey.shade600,
-                        ),
+                        style: TextStyle(fontSize: 12, color: Colors.black),
                       ),
                     ],
                   ),
@@ -4254,7 +4244,7 @@ Try asking one of the quick questions above or type your own!''';
                       'Quick Questions',
                       style: TextStyle(
                         fontWeight: FontWeight.bold,
-                        color: Colors.grey.shade700,
+                        color: Colors.black,
                       ),
                     ),
                   ),
@@ -4287,12 +4277,12 @@ Try asking one of the quick questions above or type your own!''';
                         Icon(
                           Icons.chat_bubble_outline,
                           size: 48,
-                          color: Colors.grey.shade400,
+                          color: Colors.black,
                         ),
                         const SizedBox(height: 12),
                         Text(
                           'Start a conversation',
-                          style: TextStyle(color: Colors.grey.shade600),
+                          style: TextStyle(color: Colors.black),
                         ),
                       ],
                     ),
@@ -4639,11 +4629,7 @@ class _StoreSelectionDialogState extends State<_StoreSelectionDialog> {
                     ),
                     subtitle: Row(
                       children: [
-                        Icon(
-                          Icons.location_on,
-                          size: 14,
-                          color: Colors.grey.shade600,
-                        ),
+                        Icon(Icons.location_on, size: 14, color: Colors.black),
                         const SizedBox(width: 4),
                         Text(store.city),
                         const SizedBox(width: 12),

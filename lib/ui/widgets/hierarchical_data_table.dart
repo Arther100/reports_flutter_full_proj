@@ -504,7 +504,7 @@ class _HierarchicalDataTableState extends State<HierarchicalDataTable>
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(Icons.inbox_outlined, size: 64, color: Colors.grey[400]),
+            Icon(Icons.inbox_outlined, size: 64, color: Colors.black),
             const SizedBox(height: 16),
             Text(
               'No data available',

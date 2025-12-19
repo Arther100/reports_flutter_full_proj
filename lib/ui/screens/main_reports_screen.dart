@@ -38,41 +38,7 @@ class _MainReportsScreenState extends State<MainReportsScreen> {
   Widget build(BuildContext context) {
     final dbProvider = context.watch<DatabaseProvider>();
 
-    return Scaffold(
-      body: Stack(
-        children: [
-          // Direct screen content without sidebar/appbar
-          _navigationItems[_selectedIndex].screen,
-
-          // Loading overlay during database switch
-          if (dbProvider.isLoading)
-            Container(
-              color: Colors.black.withOpacity(0.5),
-              child: Center(
-                child: Card(
-                  child: Padding(
-                    padding: const EdgeInsets.all(24),
-                    child: Column(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        const CircularProgressIndicator(),
-                        const SizedBox(height: 16),
-                        Text(
-                          'Loading data...',
-                          style: TextStyle(
-                            fontSize: 16,
-                            color: Colors.grey[700],
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-              ),
-            ),
-        ],
-      ),
-    );
+    return Scaffold(body: _navigationItems[_selectedIndex].screen);
   }
 
   // ignore: unused_element
@@ -116,7 +82,7 @@ class _MainReportsScreenState extends State<MainReportsScreen> {
               ),
               Text(
                 _navigationItems[_selectedIndex].description,
-                style: TextStyle(fontSize: 12, color: Colors.grey[600]),
+                style: TextStyle(fontSize: 12, color: Colors.black),
               ),
             ],
           ),
@@ -398,7 +364,7 @@ class _MainReportsScreenState extends State<MainReportsScreen> {
                                   '${database.host}:${database.port}',
                                   style: TextStyle(
                                     fontSize: 11,
-                                    color: Colors.grey[600],
+                                    color: Colors.black,
                                   ),
                                 ),
                               ],
@@ -650,13 +616,13 @@ class _MainReportsScreenState extends State<MainReportsScreen> {
               style: TextStyle(
                 fontSize: 28,
                 fontWeight: FontWeight.bold,
-                color: Colors.grey[700],
+                color: Colors.black,
               ),
             ),
             const SizedBox(height: 12),
             Text(
               'Please select a database from the dropdown above',
-              style: TextStyle(fontSize: 16, color: Colors.grey[500]),
+              style: TextStyle(fontSize: 16, color: Colors.black),
             ),
           ],
         ),

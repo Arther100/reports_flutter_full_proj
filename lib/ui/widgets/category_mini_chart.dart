@@ -326,12 +326,9 @@ class _CategoryMiniBarChartState extends State<CategoryMiniBarChart>
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Icon(Icons.bar_chart_outlined, size: 48, color: Colors.grey[400]),
+            Icon(Icons.bar_chart_outlined, size: 48, color: Colors.black),
             const SizedBox(height: 8),
-            Text(
-              'No data available',
-              style: TextStyle(color: Colors.grey[600]),
-            ),
+            Text('No data available', style: TextStyle(color: Colors.black)),
           ],
         ),
       ),
@@ -623,10 +620,7 @@ class _CategoryHorizontalBarsState extends State<CategoryHorizontalBars>
           children: [
             Icon(Icons.analytics_outlined, size: 48, color: Colors.grey[400]),
             const SizedBox(height: 8),
-            Text(
-              'No data available',
-              style: TextStyle(color: Colors.grey[600]),
-            ),
+            Text('No data available', style: TextStyle(color: Colors.black)),
           ],
         ),
       ),
@@ -1055,10 +1049,7 @@ class _CategoryMiniDonutState extends State<CategoryMiniDonut>
           children: [
             Icon(Icons.pie_chart_outline, size: 48, color: Colors.grey[400]),
             const SizedBox(height: 8),
-            Text(
-              'No data available',
-              style: TextStyle(color: Colors.grey[600]),
-            ),
+            Text('No data available', style: TextStyle(color: Colors.black)),
           ],
         ),
       ),

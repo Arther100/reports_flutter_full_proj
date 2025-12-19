@@ -163,7 +163,7 @@ class _PieChart3DState extends State<PieChart3D>
                       child: Icon(
                         widget.centerIcon ?? Icons.monetization_on_outlined,
                         size: 36,
-                        color: Colors.grey[400],
+                        color: Colors.black,
                       ),
                     ),
                   ],
@@ -187,11 +187,11 @@ class _PieChart3DState extends State<PieChart3D>
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Icon(Icons.pie_chart_outline, size: 48, color: Colors.grey[400]),
+            Icon(Icons.pie_chart_outline, size: 48, color: Colors.black),
             const SizedBox(height: 8),
             Text(
               'No data available',
-              style: TextStyle(color: Colors.grey[600]),
+              style: TextStyle(color: Colors.black),
             ),
           ],
         ),

@@ -40,7 +40,7 @@ class DatabaseSelector extends StatelessWidget {
                 color: Colors.grey[200],
                 shape: BoxShape.circle,
               ),
-              child: const Icon(Icons.storage, size: 20, color: Colors.grey),
+              child: const Icon(Icons.storage, size: 20, color: Colors.black),
             ),
             const SizedBox(width: 16),
             const Text(
@@ -89,7 +89,7 @@ class DatabaseSelector extends StatelessWidget {
                 'Active Database',
                 style: TextStyle(
                   fontSize: 12,
-                  color: Colors.grey[600],
+                  color: Colors.black,
                   fontWeight: FontWeight.w500,
                 ),
               ),
@@ -160,7 +160,7 @@ class DatabaseSelector extends StatelessWidget {
                               '${database.host} • ${database.database}',
                               style: TextStyle(
                                 fontSize: 11,
-                                color: Colors.grey[600],
+                                color: Colors.black,
                               ),
                             ),
                           ],
@@ -176,7 +176,7 @@ class DatabaseSelector extends StatelessWidget {
             padding: const EdgeInsets.symmetric(horizontal: 16),
             child: Row(
               children: [
-                Icon(Icons.storage, color: Colors.grey[600], size: 20),
+                Icon(Icons.storage, color: Colors.black, size: 20),
                 const SizedBox(width: 12),
                 const Expanded(
                   child: Text(
@@ -188,7 +188,7 @@ class DatabaseSelector extends StatelessWidget {
                     ),
                   ),
                 ),
-                Icon(Icons.arrow_drop_down, color: Colors.grey[600]),
+                Icon(Icons.arrow_drop_down, color: Colors.black),
               ],
             ),
           ),
@@ -258,10 +258,7 @@ class DatabaseSelector extends StatelessWidget {
                           ),
                           Text(
                             '${database.host} • ${database.database}',
-                            style: TextStyle(
-                              fontSize: 11,
-                              color: Colors.grey[600],
-                            ),
+                            style: TextStyle(fontSize: 11, color: Colors.black),
                           ),
                         ],
                       ),
@@ -304,7 +301,7 @@ class DatabaseSelector extends StatelessWidget {
                     if (dbProvider.currentTables.isNotEmpty)
                       Text(
                         '${dbProvider.currentTables.length} tables',
-                        style: TextStyle(fontSize: 10, color: Colors.grey[600]),
+                        style: TextStyle(fontSize: 10, color: Colors.black),
                       ),
                   ],
                 ),
@@ -377,7 +374,7 @@ class DatabaseSelector extends StatelessWidget {
                               'Switch to ${database.database}',
                               style: TextStyle(
                                 fontSize: 11,
-                                color: Colors.grey[600],
+                                color: Colors.black,
                               ),
                             ),
                           ],

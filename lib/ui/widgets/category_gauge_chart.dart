@@ -340,12 +340,9 @@ class _CategoryGaugeChartState extends State<CategoryGaugeChart>
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              Icon(Icons.donut_large, size: 48, color: Colors.grey[400]),
+              Icon(Icons.donut_large, size: 48, color: Colors.black),
               const SizedBox(height: 8),
-              Text(
-                'No data available',
-                style: TextStyle(color: Colors.grey[600]),
-              ),
+              Text('No data available', style: TextStyle(color: Colors.black)),
             ],
           ),
         ),

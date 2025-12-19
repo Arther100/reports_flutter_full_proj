@@ -91,10 +91,7 @@ class _InteractivePieChartState extends State<InteractivePieChart>
             children: [
               Icon(Icons.pie_chart_outline, size: 48, color: Colors.grey[400]),
               const SizedBox(height: 8),
-              Text(
-                'No data available',
-                style: TextStyle(color: Colors.grey[600]),
-              ),
+              Text('No data available', style: TextStyle(color: Colors.black)),
             ],
           ),
         ),
@@ -122,7 +119,7 @@ class _InteractivePieChartState extends State<InteractivePieChart>
               widget.title!,
               style: Theme.of(context).textTheme.titleLarge?.copyWith(
                 fontWeight: FontWeight.bold,
-                color: Colors.grey[800],
+                color: Colors.black,
               ),
             ),
             if (widget.subtitle != null) ...[
@@ -131,7 +128,7 @@ class _InteractivePieChartState extends State<InteractivePieChart>
                 widget.subtitle!,
                 style: Theme.of(
                   context,
-                ).textTheme.bodySmall?.copyWith(color: Colors.grey[500]),
+                ).textTheme.bodySmall?.copyWith(color: Colors.black),
               ),
             ],
             const SizedBox(height: 20),
@@ -210,13 +207,13 @@ class _InteractivePieChartState extends State<InteractivePieChart>
     return Column(
       mainAxisSize: MainAxisSize.min,
       children: [
-        Text('Total', style: TextStyle(fontSize: 12, color: Colors.grey[500])),
+        Text('Total', style: TextStyle(fontSize: 12, color: Colors.black)),
         Text(
           _formatValue(_total),
           style: TextStyle(
             fontSize: 18,
             fontWeight: FontWeight.bold,
-            color: Colors.grey[800],
+            color: Colors.black,
           ),
         ),
       ],
@@ -240,7 +237,7 @@ class _InteractivePieChartState extends State<InteractivePieChart>
             style: TextStyle(
               fontSize: 11,
               fontWeight: FontWeight.w600,
-              color: Colors.grey[700],
+              color: Colors.black,
             ),
             textAlign: TextAlign.center,
           ),
@@ -254,7 +251,7 @@ class _InteractivePieChartState extends State<InteractivePieChart>
           ),
           Text(
             _formatValue(item.value),
-            style: TextStyle(fontSize: 10, color: Colors.grey[500]),
+            style: TextStyle(fontSize: 10, color: Colors.black),
           ),
         ],
       ),
@@ -413,7 +410,7 @@ class _InteractivePieChartState extends State<InteractivePieChart>
                     if (item.description != null)
                       Text(
                         item.description!,
-                        style: TextStyle(fontSize: 10, color: Colors.grey[500]),
+                        style: TextStyle(fontSize: 10, color: Colors.black),
                       ),
                   ],
                 ),
@@ -543,7 +540,7 @@ class _CompactPieChartState extends State<CompactPieChart> {
                       item.title,
                       style: TextStyle(
                         fontWeight: FontWeight.bold,
-                        color: Colors.grey[800],
+                        color: Colors.black,
                       ),
                     ),
                   ],
@@ -559,13 +556,13 @@ class _CompactPieChartState extends State<CompactPieChart> {
                 ),
                 Text(
                   _formatValue(item.value),
-                  style: TextStyle(fontSize: 12, color: Colors.grey[600]),
+                  style: TextStyle(fontSize: 12, color: Colors.black),
                 ),
                 if (item.description != null) ...[
                   const SizedBox(height: 4),
                   Text(
                     item.description!,
-                    style: TextStyle(fontSize: 11, color: Colors.grey[500]),
+                    style: TextStyle(fontSize: 11, color: Colors.black),
                   ),
                 ],
               ],
@@ -672,7 +669,7 @@ class _CompactPieChartState extends State<CompactPieChart> {
                 style: TextStyle(
                   fontSize: 12,
                   fontWeight: FontWeight.bold,
-                  color: Colors.grey[700],
+                  color: Colors.black,
                 ),
                 textAlign: TextAlign.center,
               ),
@@ -757,10 +754,7 @@ class _InteractiveDonutChartState extends State<InteractiveDonutChart> {
             children: [
               Icon(Icons.pie_chart_outline, size: 48, color: Colors.grey[400]),
               const SizedBox(height: 8),
-              Text(
-                'No data available',
-                style: TextStyle(color: Colors.grey[600]),
-              ),
+              Text('No data available', style: TextStyle(color: Colors.black)),
             ],
           ),
         ),
@@ -803,7 +797,7 @@ class _InteractiveDonutChartState extends State<InteractiveDonutChart> {
                   style: TextStyle(
                     fontSize: 14,
                     fontWeight: FontWeight.bold,
-                    color: Colors.grey[600],
+                    color: Colors.black,
                   ),
                 ),
                 const SizedBox(height: 8),
@@ -984,7 +978,7 @@ class _InteractiveDonutChartState extends State<InteractiveDonutChart> {
             ),
             Text(
               item.title,
-              style: TextStyle(fontSize: 10, color: Colors.grey[600]),
+              style: TextStyle(fontSize: 10, color: Colors.black),
               overflow: TextOverflow.ellipsis,
             ),
           ],
@@ -999,11 +993,11 @@ class _InteractiveDonutChartState extends State<InteractiveDonutChart> {
             Icon(Icons.pie_chart, color: Colors.grey[400], size: 20),
             Text(
               'Hover for',
-              style: TextStyle(fontSize: 10, color: Colors.grey[500]),
+              style: TextStyle(fontSize: 10, color: Colors.black),
             ),
             Text(
               'details',
-              style: TextStyle(fontSize: 10, color: Colors.grey[500]),
+              style: TextStyle(fontSize: 10, color: Colors.black),
             ),
           ],
         );

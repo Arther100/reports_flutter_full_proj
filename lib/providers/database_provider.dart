@@ -17,26 +17,26 @@ class DatabaseProvider extends ChangeNotifier {
   String? get errorMessage => _errorMessage;
   List<String> get currentTables => _currentTables;
 
-  /// Initialize - Auto-select Teapioca database for testing
+  /// Initialize - Auto-select Teapioca database for testing (non-blocking)
   Future<void> initialize() async {
-    _isLoading = true;
-    _errorMessage = null;
+    // Set database immediately without waiting for connection
+    _currentDatabase = DatabaseConfigs.teapiocaFPDB;
+    _isLoading = false;
     notifyListeners();
 
-    try {
-      // TEMPORARY: Auto-select Teapioca database for testing
-      // TODO: Uncomment below to restore user selection
-      _currentDatabase = DatabaseConfigs.teapiocaFPDB;
-      await switchDatabase(_currentDatabase!);
+    // Connect asynchronously in background
+    _connectInBackground();
+  }
 
-      // Original code (commented for testing):
-      // _currentDatabase = null;
-      // _currentTables = [];
+  /// Connect to database in background without blocking UI
+  Future<void> _connectInBackground() async {
+    try {
+      await _dbService.switchDatabase(_currentDatabase!.id);
+      await loadTables();
+      notifyListeners();
     } catch (e) {
-      _errorMessage = 'Failed to initialize: $e';
+      _errorMessage = 'Failed to connect: $e';
       print(_errorMessage);
-    } finally {
-      _isLoading = false;
       notifyListeners();
     }
   }

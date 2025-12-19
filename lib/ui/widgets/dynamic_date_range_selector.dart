@@ -113,7 +113,7 @@ class _DynamicDateRangeSelectorState extends State<DynamicDateRangeSelector> {
                 ),
                 Text(
                   _buildRangeText(),
-                  style: TextStyle(fontSize: 12, color: Colors.grey[600]),
+                  style: TextStyle(fontSize: 12, color: Colors.black),
                 ),
               ],
             ),
@@ -199,7 +199,7 @@ class _DynamicDateRangeSelectorState extends State<DynamicDateRangeSelector> {
               style: TextStyle(
                 fontSize: 14,
                 fontWeight: FontWeight.w600,
-                color: Colors.grey[700],
+                color: Colors.black,
               ),
             ),
             const SizedBox(width: 12),
@@ -211,7 +211,7 @@ class _DynamicDateRangeSelectorState extends State<DynamicDateRangeSelector> {
         const SizedBox(height: 8),
         Text(
           'Calculating: ${_formatDate(_startDate)} to ${_formatDate(_endDate)}',
-          style: TextStyle(fontSize: 12, color: Colors.grey[600]),
+          style: TextStyle(fontSize: 12, color: Colors.black),
         ),
       ],
     );
@@ -304,7 +304,7 @@ class _DynamicDateRangeSelectorState extends State<DynamicDateRangeSelector> {
         const SizedBox(height: 8),
         Text(
           'Range: ${_formatDate(_startDate)} to ${_formatDate(_endDate)}',
-          style: TextStyle(fontSize: 12, color: Colors.grey[600]),
+          style: TextStyle(fontSize: 12, color: Colors.black),
         ),
       ],
     );
@@ -369,7 +369,7 @@ class _DynamicDateRangeSelectorState extends State<DynamicDateRangeSelector> {
         const SizedBox(height: 8),
         Text(
           'Duration: ${_endDate.difference(_startDate).inDays} days',
-          style: TextStyle(fontSize: 12, color: Colors.grey[600]),
+          style: TextStyle(fontSize: 12, color: Colors.black),
         ),
       ],
     );
@@ -419,7 +419,7 @@ class _DynamicDateRangeSelectorState extends State<DynamicDateRangeSelector> {
               label,
               style: TextStyle(
                 fontSize: 11,
-                color: Colors.grey[600],
+                color: Colors.black,
                 fontWeight: FontWeight.w500,
               ),
             ),
@@ -447,7 +447,7 @@ class _DynamicDateRangeSelectorState extends State<DynamicDateRangeSelector> {
           style: TextStyle(
             fontSize: 13,
             fontWeight: FontWeight.w600,
-            color: Colors.grey[700],
+            color: Colors.black,
           ),
         ),
         const SizedBox(height: 8),
@@ -481,7 +481,7 @@ class _DynamicDateRangeSelectorState extends State<DynamicDateRangeSelector> {
                 ),
                 child: Text(
                   preset['label'],
-                  style: TextStyle(fontSize: 12, color: Colors.grey[700]),
+                  style: TextStyle(fontSize: 12, color: Colors.black),
                 ),
               ),
             );
@@ -523,6 +523,6 @@ class _DynamicDateRangeSelectorState extends State<DynamicDateRangeSelector> {
   }
 
   TextStyle _dropdownTextStyle() {
-    return TextStyle(fontSize: 13, color: Colors.grey[700]);
+    return TextStyle(fontSize: 13, color: Colors.black);
   }
 }

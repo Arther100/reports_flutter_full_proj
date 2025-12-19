@@ -540,7 +540,7 @@ class StoreTypeDrillDownCard extends StatelessWidget {
     return Row(
       mainAxisSize: MainAxisSize.min,
       children: [
-        Icon(icon, size: 12, color: Colors.grey),
+        Icon(icon, size: 12, color: Colors.black),
         const SizedBox(width: 3),
         Flexible(
           child: Text(
@@ -553,7 +553,7 @@ class StoreTypeDrillDownCard extends StatelessWidget {
         Flexible(
           child: Text(
             label,
-            style: const TextStyle(fontSize: 9, color: Colors.grey),
+            style: const TextStyle(fontSize: 9, color: Colors.black),
             overflow: TextOverflow.ellipsis,
           ),
         ),
@@ -719,7 +719,7 @@ class CustomerTypeSummaryCard extends StatelessWidget {
     return Row(
       mainAxisSize: MainAxisSize.min,
       children: [
-        Icon(icon, size: 12, color: Colors.grey),
+        Icon(icon, size: 12, color: Colors.black),
         const SizedBox(width: 3),
         Flexible(
           child: Text(
@@ -732,7 +732,7 @@ class CustomerTypeSummaryCard extends StatelessWidget {
         Flexible(
           child: Text(
             label,
-            style: const TextStyle(fontSize: 9, color: Colors.grey),
+            style: const TextStyle(fontSize: 9, color: Colors.black),
             overflow: TextOverflow.ellipsis,
           ),
         ),

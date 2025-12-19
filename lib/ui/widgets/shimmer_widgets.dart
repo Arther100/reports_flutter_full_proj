@@ -48,10 +48,10 @@ class _ShimmerLoadingState extends State<ShimmerLoading>
 
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final baseColor =
-        widget.baseColor ?? (isDark ? Colors.grey[800]! : Colors.grey[300]!);
+        widget.baseColor ?? (isDark ? Colors.grey[700]! : Colors.grey[200]!);
     final highlightColor =
         widget.highlightColor ??
-        (isDark ? Colors.grey[700]! : Colors.grey[100]!);
+        (isDark ? Colors.grey[600]! : Colors.grey[50]!);
 
     return AnimatedBuilder(
       animation: _animation,
@@ -82,7 +82,7 @@ class ShimmerKPICard extends StatelessWidget {
     return ShimmerLoading(
       child: Container(
         decoration: BoxDecoration(
-          color: Colors.grey[800],
+          color: Colors.grey[200],
           borderRadius: BorderRadius.circular(16),
         ),
         padding: const EdgeInsets.all(16),
@@ -96,7 +96,7 @@ class ShimmerKPICard extends StatelessWidget {
                   width: 40,
                   height: 40,
                   decoration: BoxDecoration(
-                    color: Colors.grey[700],
+                    color: Colors.grey[300],
                     borderRadius: BorderRadius.circular(10),
                   ),
                 ),
@@ -104,7 +104,7 @@ class ShimmerKPICard extends StatelessWidget {
                   width: 50,
                   height: 20,
                   decoration: BoxDecoration(
-                    color: Colors.grey[700],
+                    color: Colors.grey[300],
                     borderRadius: BorderRadius.circular(4),
                   ),
                 ),
@@ -115,16 +115,16 @@ class ShimmerKPICard extends StatelessWidget {
               width: 100,
               height: 28,
               decoration: BoxDecoration(
-                color: Colors.grey[700],
+                color: Colors.grey[300],
                 borderRadius: BorderRadius.circular(4),
               ),
             ),
-            const SizedBox(height: 8),
+            const Spacer(),
             Container(
               width: 70,
               height: 14,
               decoration: BoxDecoration(
-                color: Colors.grey[700],
+                color: Colors.grey[300],
                 borderRadius: BorderRadius.circular(4),
               ),
             ),
@@ -148,7 +148,7 @@ class ShimmerChart extends StatelessWidget {
         height: height,
         margin: const EdgeInsets.all(16),
         decoration: BoxDecoration(
-          color: Colors.grey[800],
+          color: Colors.grey[200],
           borderRadius: BorderRadius.circular(16),
         ),
         child: Column(
@@ -162,7 +162,7 @@ class ShimmerChart extends StatelessWidget {
                     width: 120,
                     height: 20,
                     decoration: BoxDecoration(
-                      color: Colors.grey[700],
+                      color: Colors.grey[300],
                       borderRadius: BorderRadius.circular(4),
                     ),
                   ),
@@ -174,7 +174,7 @@ class ShimmerChart extends StatelessWidget {
                         height: 30,
                         margin: const EdgeInsets.only(left: 8),
                         decoration: BoxDecoration(
-                          color: Colors.grey[700],
+                          color: Colors.grey[300],
                           borderRadius: BorderRadius.circular(8),
                         ),
                       ),
@@ -195,7 +195,7 @@ class ShimmerChart extends StatelessWidget {
                       width: 30,
                       height: 50.0 + (i * 20) % 150,
                       decoration: BoxDecoration(
-                        color: Colors.grey[700],
+                        color: Colors.grey[300],
                         borderRadius: BorderRadius.circular(4),
                       ),
                     ),
@@ -221,7 +221,7 @@ class ShimmerListItem extends StatelessWidget {
         margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
         padding: const EdgeInsets.all(12),
         decoration: BoxDecoration(
-          color: Colors.grey[800],
+          color: Colors.grey[200],
           borderRadius: BorderRadius.circular(12),
         ),
         child: Row(
@@ -230,7 +230,7 @@ class ShimmerListItem extends StatelessWidget {
               width: 48,
               height: 48,
               decoration: BoxDecoration(
-                color: Colors.grey[700],
+                color: Colors.grey[300],
                 borderRadius: BorderRadius.circular(8),
               ),
             ),
@@ -243,7 +243,7 @@ class ShimmerListItem extends StatelessWidget {
                     width: double.infinity,
                     height: 16,
                     decoration: BoxDecoration(
-                      color: Colors.grey[700],
+                      color: Colors.grey[300],
                       borderRadius: BorderRadius.circular(4),
                     ),
                   ),
@@ -252,7 +252,7 @@ class ShimmerListItem extends StatelessWidget {
                     width: 100,
                     height: 12,
                     decoration: BoxDecoration(
-                      color: Colors.grey[700],
+                      color: Colors.grey[300],
                       borderRadius: BorderRadius.circular(4),
                     ),
                   ),
@@ -263,7 +263,7 @@ class ShimmerListItem extends StatelessWidget {
               width: 60,
               height: 24,
               decoration: BoxDecoration(
-                color: Colors.grey[700],
+                color: Colors.grey[300],
                 borderRadius: BorderRadius.circular(4),
               ),
             ),
@@ -361,7 +361,7 @@ class _MinimalShimmerState extends State<MinimalShimmer>
             gradient: LinearGradient(
               begin: Alignment(-1.0 + _controller.value * 2, 0),
               end: Alignment(_controller.value * 2, 0),
-              colors: [Colors.grey[800]!, Colors.grey[600]!, Colors.grey[800]!],
+              colors: [Colors.grey[200]!, Colors.grey[100]!, Colors.grey[200]!],
             ),
           ),
         );
